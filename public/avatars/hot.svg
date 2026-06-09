@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#FF4422"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#CC1100" stroke-width="2"/>
+  <!-- Steam coming off head -->
+  <path d="M 25 14 Q 23 8 26 4 Q 29 8 27 14" stroke="#FFAAAA" stroke-width="2" fill="none"/>
+  <path d="M 40 12 Q 38 6 41 2 Q 44 6 42 12" stroke="#FFAAAA" stroke-width="2" fill="none"/>
+  <path d="M 55 14 Q 53 8 56 4 Q 59 8 57 14" stroke="#FFAAAA" stroke-width="2" fill="none"/>
+  <!-- Sweat drops -->
+  <path d="M 14 44 Q 12 50 14 54" stroke="#FFDD88" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 66 44 Q 68 50 66 54" stroke="#FFDD88" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="28" cy="38" r="7" fill="white"/>
+  <circle cx="52" cy="38" r="7" fill="white"/>
+  <circle cx="28" cy="39" r="4" fill="#FF0000"/>
+  <circle cx="52" cy="39" r="4" fill="#FF0000"/>
+  <circle cx="27" cy="37" r="1.5" fill="white"/>
+  <circle cx="51" cy="37" r="1.5" fill="white"/>
+  <!-- Wavy squiggly angry mouth -->
+  <path d="M 26 56 Q 30 60 34 56 Q 38 52 42 56 Q 46 60 50 56 Q 54 52 56 56" stroke="#880000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+</svg>

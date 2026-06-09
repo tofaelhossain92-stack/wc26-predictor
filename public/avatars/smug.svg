@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#AADDBB"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#66AA77" stroke-width="2"/>
+  <!-- Raised eyebrow left -->
+  <path d="M 18 30 Q 28 25 34 31" stroke="#225533" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Normal eyebrow right -->
+  <path d="M 46 32 Q 54 28 62 32" stroke="#225533" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Eyes - one squinting -->
+  <circle cx="28" cy="39" r="7" fill="white"/>
+  <circle cx="52" cy="39" r="7" fill="white"/>
+  <!-- Left eye half closed (smug) -->
+  <path d="M 21 39 Q 28 37 35 39" fill="#AADDBB"/>
+  <circle cx="28" cy="41" r="4" fill="#225533"/>
+  <circle cx="52" cy="39" r="4" fill="#225533"/>
+  <circle cx="51" cy="37" r="1.5" fill="white"/>
+  <!-- Smirk (only one side) -->
+  <path d="M 34 56 Q 44 62 54 56 Q 44 58 34 56" fill="#225533"/>
+  <path d="M 34 56 Q 44 58 54 56" stroke="#225533" stroke-width="2" fill="none"/>
+</svg>

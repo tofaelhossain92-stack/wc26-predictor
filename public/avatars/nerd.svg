@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#B8D4FF"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#6688CC" stroke-width="2"/>
+  <!-- Hair parted -->
+  <path d="M 16 30 Q 20 12 38 10 L 38 20 Q 22 22 16 30" fill="#4A3728"/>
+  <path d="M 64 30 Q 60 12 42 10 L 42 20 Q 58 22 64 30" fill="#4A3728"/>
+  <!-- Big glasses -->
+  <circle cx="28" cy="38" r="10" fill="none" stroke="#333" stroke-width="2.5"/>
+  <circle cx="52" cy="38" r="10" fill="none" stroke="#333" stroke-width="2.5"/>
+  <circle cx="28" cy="38" r="10" fill="rgba(200,230,255,0.4)"/>
+  <circle cx="52" cy="38" r="10" fill="rgba(200,230,255,0.4)"/>
+  <line x1="38" y1="38" x2="42" y2="38" stroke="#333" stroke-width="2"/>
+  <line x1="18" y1="36" x2="14" y2="34" stroke="#333" stroke-width="2"/>
+  <line x1="62" y1="36" x2="66" y2="34" stroke="#333" stroke-width="2"/>
+  <!-- Eyes -->
+  <circle cx="28" cy="38" r="4" fill="#2244AA"/>
+  <circle cx="52" cy="38" r="4" fill="#2244AA"/>
+  <circle cx="29" cy="37" r="1.5" fill="white"/>
+  <circle cx="53" cy="37" r="1.5" fill="white"/>
+  <!-- Smile with buck teeth -->
+  <path d="M 30 54 Q 40 60 50 54" stroke="#334" stroke-width="2" fill="none"/>
+  <rect x="35" y="54" width="5" height="5" rx="1" fill="white" stroke="#334" stroke-width="1"/>
+  <rect x="40" y="54" width="5" height="5" rx="1" fill="white" stroke="#334" stroke-width="1"/>
+</svg>

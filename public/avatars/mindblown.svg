@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#FFDD44"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#CCA800" stroke-width="2"/>
+  <!-- Explosion top of head -->
+  <path d="M 30 14 L 28 4 L 35 12 L 34 2 L 40 11 L 46 2 L 45 12 L 52 4 L 50 14" fill="#FF6600" stroke="#CC4400" stroke-width="1"/>
+  <path d="M 32 16 L 30 8 L 36 15 L 37 6 L 40 13 L 43 6 L 44 15 L 50 8 L 48 16" fill="#FFAA00"/>
+  <!-- Wide O mouth eyes -->
+  <circle cx="26" cy="38" r="9" fill="white" stroke="#CCA800" stroke-width="1.5"/>
+  <circle cx="54" cy="38" r="9" fill="white" stroke="#CCA800" stroke-width="1.5"/>
+  <circle cx="26" cy="38" r="5" fill="#3344AA"/>
+  <circle cx="54" cy="38" r="5" fill="#3344AA"/>
+  <circle cx="24" cy="36" r="2" fill="white"/>
+  <circle cx="52" cy="36" r="2" fill="white"/>
+  <!-- Open mouth shock -->
+  <ellipse cx="40" cy="57" rx="11" ry="9" fill="#CC3300" stroke="#993300" stroke-width="1.5"/>
+  <ellipse cx="40" cy="54" rx="9" ry="5" fill="#FF9977"/>
+</svg>

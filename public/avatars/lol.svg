@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#FFE034"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#DAB800" stroke-width="2"/>
+  <!-- Closed laughing eyes -->
+  <path d="M 18 33 Q 28 27 36 33 Q 28 37 18 33" fill="#6B4C00"/>
+  <path d="M 44 33 Q 54 27 62 33 Q 54 37 44 33" fill="#6B4C00"/>
+  <!-- Tears flying out -->
+  <path d="M 18 34 Q 10 30 8 24" stroke="#55AAFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="8" cy="23" r="3.5" fill="#55AAFF"/>
+  <path d="M 62 34 Q 70 30 72 24" stroke="#55AAFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="72" cy="23" r="3.5" fill="#55AAFF"/>
+  <!-- Big open laugh mouth -->
+  <path d="M 20 52 Q 40 72 60 52 Q 50 60 40 58 Q 30 60 20 52" fill="#CC3300" stroke="#AA2200" stroke-width="1.5"/>
+  <path d="M 20 52 Q 40 58 60 52" fill="#FFAA88"/>
+  <!-- Tongue -->
+  <ellipse cx="40" cy="62" rx="8" ry="5" fill="#FF5577"/>
+  <!-- Rosy cheeks -->
+  <circle cx="16" cy="48" r="7" fill="rgba(255,150,50,0.4)"/>
+  <circle cx="64" cy="48" r="7" fill="rgba(255,150,50,0.4)"/>
+</svg>

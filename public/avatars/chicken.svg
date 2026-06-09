@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="50" r="28" fill="#FFEEAA"/>
+  <circle cx="40" cy="50" r="28" fill="none" stroke="#DDAA44" stroke-width="2"/>
+  <!-- Comb/wattle red top -->
+  <path d="M 30 24 Q 28 16 32 14 Q 34 20 36 16 Q 38 22 40 18 Q 42 22 44 16 Q 46 20 48 14 Q 52 16 50 24" fill="#CC2200"/>
+  <!-- Beak -->
+  <polygon points="40,44 34,48 46,48" fill="#FF8800"/>
+  <!-- Eyes -->
+  <circle cx="30" cy="40" r="6" fill="white"/>
+  <circle cx="50" cy="40" r="6" fill="white"/>
+  <circle cx="31" cy="40" r="3" fill="#FF8800"/>
+  <circle cx="51" cy="40" r="3" fill="#FF8800"/>
+  <circle cx="32" cy="39" r="1" fill="black"/>
+  <circle cx="52" cy="39" r="1" fill="black"/>
+  <!-- Wattle -->
+  <ellipse cx="38" cy="52" rx="5" ry="4" fill="#CC2200"/>
+  <!-- Wing hints -->
+  <path d="M 14 56 Q 16 48 24 50 Q 20 58 14 56" fill="#FFDDAA" stroke="#DDAA44" stroke-width="1"/>
+  <path d="M 66 56 Q 64 48 56 50 Q 60 58 66 56" fill="#FFDDAA" stroke="#DDAA44" stroke-width="1"/>
+</svg>

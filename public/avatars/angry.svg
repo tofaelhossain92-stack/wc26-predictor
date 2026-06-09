@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#FF6B35"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#CC4400" stroke-width="2"/>
+  <!-- Furrowed brows -->
+  <path d="M 18 32 Q 30 26 34 33" stroke="#8B2200" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 62 32 Q 50 26 46 33" stroke="#8B2200" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Angry eyes -->
+  <circle cx="28" cy="38" r="6" fill="white"/>
+  <circle cx="52" cy="38" r="6" fill="white"/>
+  <circle cx="29" cy="39" r="3.5" fill="#333"/>
+  <circle cx="53" cy="39" r="3.5" fill="#333"/>
+  <!-- Vein on forehead -->
+  <path d="M 36 22 Q 38 18 40 22 Q 42 18 44 22" stroke="#8B2200" stroke-width="1.5" fill="none"/>
+  <!-- Gritted teeth -->
+  <path d="M 26 56 Q 40 62 54 56" stroke="#8B2200" stroke-width="2" fill="white"/>
+  <line x1="33" y1="57" x2="33" y2="60" stroke="#8B2200" stroke-width="1.5"/>
+  <line x1="40" y1="58" x2="40" y2="61" stroke="#8B2200" stroke-width="1.5"/>
+  <line x1="47" y1="57" x2="47" y2="60" stroke="#8B2200" stroke-width="1.5"/>
+</svg>

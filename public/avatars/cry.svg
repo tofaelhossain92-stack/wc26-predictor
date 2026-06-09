@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="36" fill="#FFE566"/>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#DAB800" stroke-width="2"/>
+  <!-- Squinting happy eyes -->
+  <path d="M 20 36 Q 28 30 36 36" stroke="#6B4C00" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 44 36 Q 52 30 60 36" stroke="#6B4C00" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Tears streaming -->
+  <path d="M 23 38 Q 20 46 22 52" stroke="#66AAFF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 57 38 Q 60 46 58 52" stroke="#66AAFF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="22" cy="53" rx="3" ry="4" fill="#66AAFF" opacity="0.8"/>
+  <ellipse cx="58" cy="53" rx="3" ry="4" fill="#66AAFF" opacity="0.8"/>
+  <!-- Big happy mouth -->
+  <path d="M 24 52 Q 40 68 56 52" fill="#FF6B2B" stroke="#CC4400" stroke-width="1.5"/>
+  <path d="M 24 52 Q 40 58 56 52" fill="#FFCCAA"/>
+  <!-- Rosy cheeks -->
+  <circle cx="18" cy="46" r="6" fill="rgba(255,150,100,0.4)"/>
+  <circle cx="62" cy="46" r="6" fill="rgba(255,150,100,0.4)"/>
+</svg>
