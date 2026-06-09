@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 200" fill="white">
+  <!-- Head -->
+  <circle cx="50" cy="60" r="18"/>
+  <!-- Body horizontal -->
+  <path d="M 60 50 Q 120 44 180 48 Q 185 62 180 72 Q 120 68 62 72 Z"/>
+  <!-- Left arm extended fully (reaching for ball) -->
+  <path d="M 60 52 Q 28 40 8 28 Q 4 38 14 44 Q 38 54 62 64 Z"/>
+  <!-- Glove/hand -->
+  <ellipse cx="5" cy="28" rx="12" ry="9" transform="rotate(-20 5 28)"/>
+  <!-- Ball near glove -->
+  <circle cx="340" cy="30" r="22" fill="white"/>
+  <path d="M 330 18 L 340 12 L 350 18 L 350 30 L 340 36 L 330 30 Z" fill="rgba(0,0,0,0.25)"/>
+  <line x1="340" y1="12" x2="340" y2="36" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+  <line x1="330" y1="24" x2="350" y2="24" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+  <!-- Right arm back for balance -->
+  <path d="M 175 52 Q 205 60 225 72 Q 222 80 214 78 Q 194 66 172 58 Z"/>
+  <!-- Right leg extended back -->
+  <path d="M 178 68 Q 240 75 295 78 Q 300 88 290 92 Q 236 90 175 82 Z"/>
+  <!-- Right foot -->
+  <ellipse cx="298" cy="88" rx="18" ry="9" transform="rotate(5 298 88)"/>
+  <!-- Left leg bent down -->
+  <path d="M 80 70 Q 88 110 84 145 Q 90 150 98 146 Q 102 112 96 72 Z"/>
+  <!-- Left foot -->
+  <ellipse cx="88" cy="148" rx="16" ry="8" transform="rotate(-10 88 148)"/>
+</svg>

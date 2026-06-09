@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" fill="white">
+  <!-- Head -->
+  <circle cx="140" cy="30" r="16"/>
+  <!-- Body (torso leaning back) -->
+  <path d="M 130 44 Q 100 70 85 100 Q 80 115 90 125 L 110 120 Q 105 108 112 95 Q 125 72 145 55 Z"/>
+  <!-- Kicking leg (extended up-right) -->
+  <path d="M 90 125 Q 75 110 55 90 Q 45 80 40 65 Q 50 60 58 72 Q 72 88 90 108 Z"/>
+  <!-- Foot on kicking leg -->
+  <ellipse cx="38" cy="60" rx="14" ry="8" transform="rotate(-30 38 60)"/>
+  <!-- Other leg (down) -->
+  <path d="M 110 120 Q 120 145 125 175 Q 128 190 120 200 L 110 198 Q 116 188 114 174 Q 110 148 100 122 Z"/>
+  <!-- Foot down leg -->
+  <ellipse cx="115" cy="202" rx="12" ry="7" transform="rotate(10 115 202)"/>
+  <!-- Arms spread for balance -->
+  <path d="M 125 65 Q 155 55 175 45 Q 178 55 158 62 Q 140 70 128 78 Z"/>
+  <path d="M 118 72 Q 100 90 82 115 Q 74 118 72 110 Q 88 88 108 64 Z"/>
+</svg>

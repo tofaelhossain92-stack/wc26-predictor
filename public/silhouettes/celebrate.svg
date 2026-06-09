@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320" fill="white">
+  <!-- Head -->
+  <circle cx="150" cy="35" r="18"/>
+  <!-- Neck -->
+  <rect x="143" y="50" width="14" height="16" rx="4"/>
+  <!-- Torso -->
+  <path d="M 125 65 Q 118 120 120 155 L 180 155 Q 182 120 175 65 Z"/>
+  <!-- Left arm raised wide -->
+  <path d="M 128 75 Q 95 55 65 35 Q 58 45 68 52 Q 96 70 126 92 Z"/>
+  <!-- Left hand -->
+  <circle cx="60" cy="32" r="10"/>
+  <!-- Right arm raised wide -->
+  <path d="M 172 75 Q 205 55 235 35 Q 242 45 232 52 Q 204 70 174 92 Z"/>
+  <!-- Right hand -->
+  <circle cx="240" cy="32" r="10"/>
+  <!-- Left leg -->
+  <path d="M 130 155 Q 118 200 110 245 Q 108 258 116 262 L 126 260 Q 120 248 122 236 Q 130 192 142 155 Z"/>
+  <!-- Right leg -->
+  <path d="M 170 155 Q 182 200 190 245 Q 192 258 184 262 L 174 260 Q 180 248 178 236 Q 170 192 158 155 Z"/>
+  <!-- Left foot -->
+  <ellipse cx="118" cy="264" rx="16" ry="8"/>
+  <!-- Right foot -->
+  <ellipse cx="182" cy="264" rx="16" ry="8"/>
+</svg>

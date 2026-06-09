@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 340" fill="white">
+  <!-- Head (leaning forward) -->
+  <circle cx="120" cy="28" r="17"/>
+  <!-- Body leaning forward -->
+  <path d="M 108 44 Q 95 85 90 120 Q 88 135 95 142 L 130 138 Q 125 128 128 112 Q 132 78 142 48 Z"/>
+  <!-- Left arm back -->
+  <path d="M 108 65 Q 80 80 58 100 Q 52 107 58 112 Q 66 106 80 92 Q 100 74 115 62 Z"/>
+  <!-- Right arm forward -->
+  <path d="M 138 62 Q 162 52 182 46 Q 186 55 174 60 Q 156 66 140 78 Z"/>
+  <!-- Right leg forward (stepping) -->
+  <path d="M 130 138 Q 148 168 158 200 Q 162 216 155 224 L 144 222 Q 150 214 146 200 Q 136 168 118 140 Z"/>
+  <!-- Right foot with ball -->
+  <ellipse cx="150" cy="227" rx="14" ry="7" transform="rotate(-15 150 227)"/>
+  <!-- Ball -->
+  <circle cx="162" cy="240" r="18" fill="white"/>
+  <path d="M 155 228 L 162 222 L 170 228 L 170 240 L 162 246 L 155 240 Z" fill="rgba(0,0,0,0.3)"/>
+  <line x1="162" y1="222" x2="162" y2="246" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+  <line x1="155" y1="234" x2="170" y2="234" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+  <!-- Left leg back -->
+  <path d="M 95 142 Q 82 172 76 205 Q 74 218 82 222 L 90 220 Q 85 214 88 202 Q 94 170 106 142 Z"/>
+  <!-- Left foot -->
+  <ellipse cx="80" cy="224" rx="13" ry="7" transform="rotate(5 80 224)"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 360" fill="white">
+  <!-- Head (looking up at target) -->
+  <circle cx="105" cy="28" r="17"/>
+  <!-- Body (slight lean back from kick follow-through) -->
+  <path d="M 94 44 Q 84 90 82 130 Q 80 148 90 156 L 128 150 Q 126 136 128 116 Q 130 78 118 46 Z"/>
+  <!-- Left arm out for balance -->
+  <path d="M 90 75 Q 58 70 36 68 Q 33 78 44 80 Q 66 82 94 88 Z"/>
+  <!-- Right arm back -->
+  <path d="M 115 72 Q 148 80 168 90 Q 170 100 160 100 Q 140 90 112 82 Z"/>
+  <!-- Left leg planted firmly -->
+  <path d="M 92 154 Q 84 200 80 245 Q 78 260 88 264 L 98 262 Q 92 250 95 236 Q 100 192 108 154 Z"/>
+  <!-- Left foot planted -->
+  <ellipse cx="84" cy="267" rx="20" ry="9"/>
+  <!-- Right leg extended in kick follow-through (up and forward) -->
+  <path d="M 125 148 Q 155 125 178 98 Q 188 90 192 98 Q 182 110 160 135 Q 140 158 128 168 Z"/>
+  <!-- Right shin/foot extended -->
+  <path d="M 178 98 Q 200 80 218 65 Q 224 72 216 80 Q 196 94 178 112 Z"/>
+  <!-- Boot/foot -->
+  <ellipse cx="222" cy="62" rx="16" ry="9" transform="rotate(-40 222 62)"/>
+  <!-- Ball (just struck, slightly above ground) -->
+  <circle cx="200" cy="290" r="24"/>
+  <path d="M 188 276 L 200 268 L 212 276 L 212 292 L 200 300 L 188 292 Z" fill="rgba(0,0,0,0.25)"/>
+  <line x1="200" y1="268" x2="200" y2="300" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+  <line x1="188" y1="284" x2="212" y2="284" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+</svg>

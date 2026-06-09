@@ -1,4 +1,5 @@
 'use client'
+import PitchBackground from '@/components/PitchBackground'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -90,14 +91,13 @@ export default function GameClient() {
   const currentPlayerData = leaderboard.find(p => p.id === user.id)
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg,#0a0f1e 0%,#0d1f3c 50%,#0a0f1e 100%)' }}>
-      {/* BG grid */}
-      <div style={{ position: 'fixed', inset: 0, opacity: 0.03, pointerEvents: 'none', backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 40px,#fff 40px,#fff 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,#fff 40px,#fff 41px)' }} />
+    <div style={{ minHeight: '100vh', background: `radial-gradient(ellipse at 50% -10%, rgba(0,160,60,0.15) 0%, transparent 50%), linear-gradient(180deg, #060d1a 0%, #0a1628 60%, #071510 100%)`' }}>
+      <PitchBackground />
 
       {/* Header */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(10,15,30,0.9)', backdropFilter: 'blur(20px)',
+        background: 'rgba(4,10,20,0.92)', backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
