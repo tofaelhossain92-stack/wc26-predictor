@@ -1,21 +1,26 @@
 'use client'
 import { useState } from 'react'
 
-const DATE_LABELS = {
-  'upcoming': null,
-  'live': '🔴 Live',
-  'done': '✓ Final',
-}
-
 function MatchCard({ match, prediction, onPredict }) {
   const [homeG, setHomeG] = useState(prediction?.predictedHome ?? '')
   const [awayG, setAwayG] = useState(prediction?.predictedAway ?? '')
-  const [saving, setSaving]   = useState(false)
-  const [saved, setSaved]     = useState(!!prediction)
-  const [error, setError]     = useState('')
-  const [shake, setShake]     = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved]   = useState(!!prediction)
+  const [error, setError]   = useState('')
+  const [shake, setShake]   = useState(false)
 
   const locked = match.status === 'live' || match.status === 'done'
+
+  // Only allow predictions on game day
+  const kickoff  = new Date(match.kickoff_time)
+  const now      = new Date()
+  const isGameDay = (
+    now.getFullYear() === kickoff.getFullYear() &&
+    now.getMonth()    === kickoff.getMonth() &&
+    now.getDate()     === kickoff.getDate()
+  )
+  const isFuture  = now < kickoff && !isGameDay
+  const daysUntil = Math.ceil((kickoff - now) / (1000 * 60 * 60 * 24))
 
   const winner = homeG !== '' && awayG !== ''
     ? +homeG > +awayG ? match.home_team : +homeG < +awayG ? match.away_team : 'Draw'
@@ -31,8 +36,8 @@ function MatchCard({ match, prediction, onPredict }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: onPredict.userId,
-          matchId: match.id,
+          userId:    onPredict.userId,
+          matchId:   match.id,
           homeGoals: +homeG,
           awayGoals: +awayG,
         }),
@@ -48,17 +53,17 @@ function MatchCard({ match, prediction, onPredict }) {
     }
   }
 
-  const kickoff = new Date(match.kickoff_time)
   const dateStr = kickoff.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
   const timeStr = kickoff.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
 
   return (
     <div className={shake ? 'shake' : ''} style={{
-      background: 'rgba(255,255,255,0.03)',
-      border: `1px solid ${saved ? 'rgba(245,197,24,0.3)' : 'rgba(255,255,255,0.08)'}`,
+      background: isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.03)',
+      border: `1px solid ${saved ? 'rgba(245,197,24,0.3)' : isFuture ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)'}`,
       borderRadius: 16, padding: '20px 24px', marginBottom: 12,
       boxShadow: saved ? '0 0 20px rgba(245,197,24,0.07)' : 'none',
       transition: 'all 0.3s',
+      opacity: isFuture ? 0.6 : 1,
     }}>
       {/* Match header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -81,11 +86,16 @@ function MatchCard({ match, prediction, onPredict }) {
               🔒 Locked In
             </span>
           )}
+          {isFuture && (
+            <span style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 600 }}>
+              🗓️ {daysUntil === 1 ? 'Opens tomorrow' : `Opens in ${daysUntil} days`}
+            </span>
+          )}
         </div>
         <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11 }}>{dateStr} · {timeStr}</span>
       </div>
 
-      {/* Teams + Score inputs */}
+      {/* Teams */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center' }}>
         {/* Home */}
         <div style={{ textAlign: 'center' }}>
@@ -95,16 +105,16 @@ function MatchCard({ match, prediction, onPredict }) {
             type="number" min={0} max={20}
             value={homeG}
             onChange={e => { setHomeG(e.target.value); setSaved(false) }}
-            disabled={locked || saved}
+            disabled={locked || saved || isFuture}
             placeholder="0"
             style={{
               width: 64, height: 64, textAlign: 'center', fontSize: 28, fontWeight: 700,
-              background: locked || saved ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.08)',
+              background: locked || saved || isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.08)',
               border: '2px solid rgba(255,255,255,0.12)',
-              borderRadius: 12, color: '#f5c518', outline: 'none',
+              borderRadius: 12, color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
+              cursor: isFuture ? 'not-allowed' : 'auto',
             }}
           />
-          {/* Actual result */}
           {match.status === 'done' && match.home_goals != null && (
             <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 6 }}>
               Actual: <strong style={{ color: '#fff' }}>{match.home_goals}</strong>
@@ -112,10 +122,10 @@ function MatchCard({ match, prediction, onPredict }) {
           )}
         </div>
 
-        {/* VS / winner */}
+        {/* VS */}
         <div style={{ textAlign: 'center', minWidth: 60 }}>
           <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 13, fontWeight: 600 }}>VS</div>
-          {winner && !locked && (
+          {winner && !locked && !isFuture && (
             <div style={{ color: '#00c896', fontSize: 10, marginTop: 4, fontWeight: 700 }}>
               {winner === 'Draw' ? 'Draw 🤝' : `${winner} 🏆`}
             </div>
@@ -135,13 +145,14 @@ function MatchCard({ match, prediction, onPredict }) {
             type="number" min={0} max={20}
             value={awayG}
             onChange={e => { setAwayG(e.target.value); setSaved(false) }}
-            disabled={locked || saved}
+            disabled={locked || saved || isFuture}
             placeholder="0"
             style={{
               width: 64, height: 64, textAlign: 'center', fontSize: 28, fontWeight: 700,
-              background: locked || saved ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.08)',
+              background: locked || saved || isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.08)',
               border: '2px solid rgba(255,255,255,0.12)',
-              borderRadius: 12, color: '#f5c518', outline: 'none',
+              borderRadius: 12, color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
+              cursor: isFuture ? 'not-allowed' : 'auto',
             }}
           />
           {match.status === 'done' && match.away_goals != null && (
@@ -152,7 +163,7 @@ function MatchCard({ match, prediction, onPredict }) {
         </div>
       </div>
 
-      {/* Points earned banner */}
+      {/* Points earned */}
       {match.status === 'done' && prediction && (
         <div style={{
           marginTop: 14, padding: '10px 16px', borderRadius: 10, textAlign: 'center',
@@ -160,14 +171,23 @@ function MatchCard({ match, prediction, onPredict }) {
           border: `1px solid ${prediction.pointsEarned > 0 ? 'rgba(0,200,150,0.25)' : 'rgba(255,255,255,0.08)'}`,
         }}>
           {prediction.pointsEarned > 0
-            ? <span style={{ color: '#00c896', fontWeight: 700 }}>+{prediction.pointsEarned} pts earned! 🎉 Your prediction: {prediction.predictedHome}–{prediction.predictedAway}</span>
-            : <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>Your prediction: {prediction.predictedHome}–{prediction.predictedAway} · 0 pts this time 😅</span>
+            ? <span style={{ color: '#00c896', fontWeight: 700 }}>+{prediction.pointsEarned} pts earned! 🎉 Your pick: {prediction.predictedHome}–{prediction.predictedAway}</span>
+            : <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>Your pick: {prediction.predictedHome}–{prediction.predictedAway} · 0 pts 😅</span>
           }
         </div>
       )}
 
-      {/* Save button */}
-      {!locked && !saved && (
+      {/* Future match message */}
+      {isFuture && (
+        <div style={{ marginTop: 14, textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
+            🗓️ Predictions open on <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{dateStr}</strong>
+          </div>
+        </div>
+      )}
+
+      {/* Save button — only on game day, not locked */}
+      {!locked && !saved && !isFuture && (
         <>
           {error && <div style={{ color: '#ff4a4a', fontSize: 12, marginTop: 10, textAlign: 'center' }}>{error}</div>}
           <button onClick={handleSave} disabled={saving} style={{
@@ -199,10 +219,10 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
     myData.predictions.forEach(p => { myPredMap[p.matchId] = p })
   }
 
-  const dates        = ['All', ...new Set(
+  const dates    = ['All', ...new Set(
     matches.map(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }))
   )]
-  const filtered     = filterDate === 'All'
+  const filtered = filterDate === 'All'
     ? matches
     : matches.filter(m =>
         new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) === filterDate
@@ -211,19 +231,39 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
   const predCount  = Object.keys(myPredMap).length
   const totalCount = matches.filter(m => m.status === 'upcoming').length
 
+  // Count today's matches available for prediction
+  const now = new Date()
+  const todayMatches = matches.filter(m => {
+    const k = new Date(m.kickoff_time)
+    return k.getFullYear() === now.getFullYear() &&
+           k.getMonth()    === now.getMonth() &&
+           k.getDate()     === now.getDate() &&
+           m.status === 'upcoming'
+  })
+
   return (
     <div>
       {/* Points key */}
       <div style={{
         background: 'rgba(245,197,24,0.06)', border: '1px solid rgba(245,197,24,0.15)',
-        borderRadius: 14, padding: '12px 18px', marginBottom: 20,
-        display: 'flex', gap: 20, flexWrap: 'wrap',
+        borderRadius: 14, padding: '12px 18px', marginBottom: 16,
+        display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center',
       }}>
         <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}><span style={{ color: '#f5c518', fontWeight: 700 }}>3 pts</span> · Correct result</span>
         <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}><span style={{ color: '#f5c518', fontWeight: 700 }}>+7 pts</span> · Exact score</span>
         <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}><span style={{ color: '#00c896', fontWeight: 700 }}>10 pts</span> · Perfect!</span>
         <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }}>{predCount} / {totalCount + predCount} predicted</span>
       </div>
+
+      {/* Today's matches banner */}
+      {todayMatches.length > 0 && (
+        <div style={{ background: 'rgba(0,200,80,0.08)', border: '1px solid rgba(0,200,80,0.2)', borderRadius: 12, padding: '10px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 18 }}>⚽</span>
+          <span style={{ color: '#00c896', fontSize: 13, fontWeight: 600 }}>
+            {todayMatches.length} match{todayMatches.length > 1 ? 'es' : ''} today — predictions are open!
+          </span>
+        </div>
+      )}
 
       {/* Date filter */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
@@ -238,7 +278,6 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
         ))}
       </div>
 
-      {/* Match cards */}
       {filtered.map(match => (
         <MatchCard
           key={match.id}
@@ -249,9 +288,7 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
       ))}
 
       {filtered.length === 0 && (
-        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', padding: '40px 0' }}>
-          No matches on this date
-        </div>
+        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', padding: '40px 0' }}>No matches on this date</div>
       )}
     </div>
   )
