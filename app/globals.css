@@ -1,11 +1,12 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #0a0f1e;
-  --bg2:       #0d1f3c;
+  --bg:        #060d1a;
+  --bg2:       #0a1628;
   --gold:      #f5c518;
   --gold-dim:  #e6a800;
-  --green:     #00c896;
+  --green:     #00c84a;
+  --green-dim: #00a83c;
   --red:       #ff4a4a;
   --blue:      #4a9eff;
   --text:      #ffffff;
@@ -18,24 +19,18 @@
 }
 
 html, body {
-  background: var(--bg);
+  background: #060d1a;
   color: var(--text);
   font-family: 'Georgia', 'Times New Roman', serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-input, button, textarea, select {
-  font-family: inherit;
-}
-
+input, button, textarea, select { font-family: inherit; }
 input::placeholder { color: var(--text-faint); }
-
-/* Number input spinners */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { opacity: 1; }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
@@ -44,7 +39,6 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes shake {
   0%,100% { transform: translateX(0); }
   20%     { transform: translateX(-6px); }
@@ -52,12 +46,16 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   60%     { transform: translateX(-4px); }
   80%     { transform: translateX(4px); }
 }
-
 @keyframes pulse {
   0%,100% { opacity: 1; }
   50%     { opacity: 0.5; }
 }
+@keyframes float {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  50%     { transform: translateY(-10px) rotate(5deg); }
+}
 
-.fade-in  { animation: fadeIn 0.3s ease forwards; }
+.fade-in  { animation: fadeIn 0.35s ease forwards; }
 .shake    { animation: shake 0.4s ease; }
 .pulsing  { animation: pulse 1.5s ease infinite; }
+.floating { animation: float 4s ease infinite; }
