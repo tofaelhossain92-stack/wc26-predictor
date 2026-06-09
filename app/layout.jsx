@@ -1,8 +1,8 @@
-import { Geist } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 
-const geist = Geist({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'WC26 Predictor 🏆',
@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#0a0f1e" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={geist.className}>
+      <body className={inter.className}>
         {children}
 
         {/* OneSignal Push Notification SDK */}
