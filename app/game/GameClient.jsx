@@ -91,7 +91,7 @@ export default function GameClient() {
   const currentPlayerData = leaderboard.find(p => p.id === user.id)
 
   return (
-    <div style={{ minHeight: '100vh', background: `radial-gradient(ellipse at 50% -10%, rgba(0,160,60,0.15) 0%, transparent 50%), linear-gradient(180deg, #060d1a 0%, #0a1628 60%, #071510 100%)`' }}>
+    <div style={{ minHeight: '100vh', background: `radial-gradient(ellipse at 50% -10%, rgba(0,160,60,0.15) 0%, transparent 50%), linear-gradient(180deg, #060d1a 0%, #0a1628 60%, #071510 100%)` }}>
       <PitchBackground />
 
       {/* Header */}
