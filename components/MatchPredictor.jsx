@@ -211,7 +211,10 @@ function MatchCard({ match, prediction, onPredict }) {
 }
 
 export default function MatchPredictor({ matches, user, leaderboard, onPredicted }) {
-  const [filterDate, setFilterDate] = useState('All')
+  const [filterDate, setFilterDate] = useState(() => {
+    const today = new Date()
+    return today.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
+  })
 
   const myData    = leaderboard.find(p => p.id === user.id)
   const myPredMap = {}

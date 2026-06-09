@@ -109,7 +109,11 @@ export default function GameClient() {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 24 }}>{user.avatar}</span>
+          {user.avatar?.startsWith('/') ? (
+            <img src={user.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: 8, border: '2px solid rgba(255,210,0,0.3)' }} />
+          ) : (
+            <span style={{ fontSize: 24 }}>{user.avatar || '⚽'}</span>
+          )}
           <div>
             <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 14 }}>{user.name}</div>
             <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>{currentPlayerData?.points || 0} pts</div>
