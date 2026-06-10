@@ -269,17 +269,23 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
       )}
 
       {/* Date filter */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-        {dates.map(d => (
-          <button key={d} onClick={() => setFilterDate(d)} style={{
-            padding: '6px 14px', borderRadius: 20,
-            background: filterDate === d ? 'rgba(245,197,24,0.15)' : 'rgba(255,255,255,0.04)',
-            border: filterDate === d ? '1px solid rgba(245,197,24,0.4)' : '1px solid rgba(255,255,255,0.08)',
-            color: filterDate === d ? '#f5c518' : 'rgba(255,255,255,0.4)',
-            fontSize: 12, cursor: 'pointer', fontWeight: filterDate === d ? 700 : 400, transition: 'all 0.15s',
-          }}>{d}</button>
-        ))}
-      </div>
+<div style={{
+  display: 'flex', gap: 8, marginBottom: 20,
+  overflowX: 'auto', paddingBottom: 6,
+  scrollbarWidth: 'none', /* Firefox */
+  msOverflowStyle: 'none', /* IE */
+}}>
+  {dates.map(d => (
+    <button key={d} onClick={() => setFilterDate(d)} style={{
+      padding: '6px 14px', borderRadius: 20,
+      flexShrink: 0, whiteSpace: 'nowrap',
+      background: filterDate === d ? 'rgba(245,197,24,0.15)' : 'rgba(255,255,255,0.04)',
+      border: filterDate === d ? '1px solid rgba(245,197,24,0.4)' : '1px solid rgba(255,255,255,0.08)',
+      color: filterDate === d ? '#f5c518' : 'rgba(255,255,255,0.4)',
+      fontSize: 12, cursor: 'pointer', fontWeight: filterDate === d ? 700 : 400, transition: 'all 0.15s',
+    }}>{d}</button>
+  ))}
+</div>
 
       {filtered.map(match => (
         <MatchCard
