@@ -10,7 +10,9 @@ function StatCard({ label, player }) {
       background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
       borderRadius: 12, padding: '14px 16px', textAlign: 'center',
     }}>
-      <div style={{ fontSize: 28, marginBottom: 4 }}>{player.avatar}</div>
+      <div style={{ fontSize: 28, marginBottom: 4 }}>
+        {player.avatar?.startsWith('/') ? <img src={player.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: 8 }} /> : player.avatar}
+      </div>
       <div style={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>{player.name}</div>
       <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 4 }}>{label}</div>
     </div>
@@ -106,7 +108,9 @@ export default function Leaderboard({ leaderboard, currentUserId }) {
             <div style={{ fontSize: 22, minWidth: 32, textAlign: 'center' }}>
               {MEDALS[i] || <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>#{i + 1}</span>}
             </div>
-            <div style={{ fontSize: 28 }}>{player.avatar}</div>
+            <div style={{ fontSize: 28 }}>
+              {player.avatar?.startsWith('/') ? <img src={player.avatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: 8, border: '2px solid rgba(255,255,255,0.1)' }} /> : player.avatar}
+            </div>
             <div style={{ flex: 1 }}>
               <div style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>
                 {player.name}
