@@ -9,12 +9,13 @@ function MatchCard({ match, prediction, onPredict }) {
   const [error, setError]   = useState('')
   const [shake, setShake]   = useState(false)
 
-  const kickoffPlus15 = new Date(kickoff.getTime() + 15 * 60 * 1000)
   const locked = match.status === 'live' || match.status === 'done' || now >= kickoffPlus15
 
   // Only allow predictions on game day
   const kickoff  = new Date(match.kickoff_time)
   const now      = new Date()
+const kickoffPlus15 = new Date(kickoff.getTime() + 15 * 60 * 1000)
+const locked = match.status === 'live' || match.status === 'done' || now >= kickoffPlus15
   const isGameDay = (
     now.getFullYear() === kickoff.getFullYear() &&
     now.getMonth()    === kickoff.getMonth() &&
