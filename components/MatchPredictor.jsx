@@ -9,7 +9,8 @@ function MatchCard({ match, prediction, onPredict }) {
   const [error, setError]   = useState('')
   const [shake, setShake]   = useState(false)
 
-  const locked = match.status === 'live' || match.status === 'done'
+  const kickoffPlus15 = new Date(kickoff.getTime() + 15 * 60 * 1000)
+  const locked = match.status === 'live' || match.status === 'done' || now >= kickoffPlus15
 
   // Only allow predictions on game day
   const kickoff  = new Date(match.kickoff_time)
@@ -181,7 +182,7 @@ function MatchCard({ match, prediction, onPredict }) {
       {isFuture && (
         <div style={{ marginTop: 14, textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-            🗓️ Predictions open on <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{dateStr}</strong>
+            🗓️ Predictions open on <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{dateStr}</strong> · lock 15 min after kickoff
           </div>
         </div>
       )}
