@@ -88,7 +88,9 @@ export default function TrashTalk({ user }) {
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <div style={{ fontSize: 24 }}>{user.avatar}</div>
+          <div style={{ fontSize: 24 }}>
+            {user.avatar?.startsWith('/') ? <img src={user.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: 8 }} /> : user.avatar}
+          </div>
           <input
             value={content}
             onChange={e => setContent(e.target.value)}
@@ -136,7 +138,9 @@ export default function TrashTalk({ user }) {
             border: `1px solid ${msg.user?.id === user.id ? 'rgba(245,197,24,0.15)' : 'rgba(255,255,255,0.07)'}`,
             borderRadius: 12, padding: '12px 16px', marginBottom: 10,
           }}>
-            <div style={{ fontSize: 26, flexShrink: 0 }}>{msg.user?.avatar || '👤'}</div>
+            <div style={{ fontSize: 26, flexShrink: 0 }}>
+              {msg.user?.avatar?.startsWith('/') ? <img src={msg.user.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: 8 }} /> : (msg.user?.avatar || '👤')}
+            </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span style={{ color: '#f5c518', fontWeight: 700, fontSize: 13 }}>
