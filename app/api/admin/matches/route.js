@@ -1,39 +1,54 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
 import { settlePredictions } from '@/lib/points'
 import { notifyResultIn } from '@/lib/onesignal'
 
 export const dynamic = 'force-dynamic'
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xtairnvavocsliewquhd.supabase.co'
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...options.headers,
+    }
+  })
+  return res.json()
+}
+
 export async function GET() {
-  const { data, error } = await supabaseAdmin
-    .from('matches')
-    .select('*')
-    .order('kickoff_time', { ascending: true })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  const data = await sbFetch('matches?select=*&order=kickoff_time.asc')
   return NextResponse.json({ ok: true, matches: data })
 }
 
 export async function POST(request) {
   const { id, home_goals, away_goals, status } = await request.json()
 
-  const { data: existing } = await supabaseAdmin
-    .from('matches')
-    .select('*')
-    .eq('id', id)
-    .single()
+  // Get existing match
+  const existing = await sbFetch(`matches?id=eq.${id}&select=*`)
+  const match = existing[0]
 
-  await supabaseAdmin
-    .from('matches')
-    .update({ home_goals, away_goals, status })
-    .eq('id', id)
+  // Update match
+  const updated = await sbFetch(`matches?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ home_goals, away_goals, status }),
+  })
 
-  if (status === 'done' && existing?.status !== 'done') {
+  console.log('Updated:', updated)
+
+  // If marking as done, settle predictions and notify
+  if (status === 'done' && match?.status !== 'done') {
+    const { supabaseAdmin } = await import('@/lib/supabase')
     await settlePredictions(supabaseAdmin, id, home_goals, away_goals)
     await notifyResultIn(
-      existing.home_team, existing.away_team,
+      match.home_team, match.away_team,
       home_goals, away_goals,
-      existing.home_flag, existing.away_flag
+      match.home_flag, match.away_flag
     )
   }
 
