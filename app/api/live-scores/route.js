@@ -9,10 +9,13 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
+    const now = new Date().toISOString()
+    // Also catch matches that have kicked off but status not yet updated
     const { data: liveMatches } = await supabaseAdmin
       .from('matches')
       .select('*')
-      .eq('status', 'live')
+      .in('status', ['live', 'upcoming'])
+      .lte('kickoff_time', now)
 
     if (!liveMatches?.length) {
       return NextResponse.json({ ok: true, updated: 0 })
