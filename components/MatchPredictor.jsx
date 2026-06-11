@@ -154,10 +154,13 @@ function MatchCard({ match, prediction, onPredict }) {
               {winner === 'Draw' ? 'Draw 🤝' : `${winner} 🏆`}
             </div>
           )}
-          {match.status === 'done' && match.home_goals != null && (
-            <div style={{ color: '#f5c518', fontSize: 22, fontWeight: 700, margin: '4px 0' }}>
+          {(match.status === 'done' || match.status === 'live') && match.home_goals != null && (
+            <div style={{ color: match.status === 'live' ? '#ff4a4a' : '#f5c518', fontSize: 22, fontWeight: 700, margin: '4px 0' }}>
               {match.home_goals}–{match.away_goals}
             </div>
+          )}
+          {match.status === 'live' && (
+            <div className="pulsing" style={{ color: '#ff4a4a', fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>LIVE</div>
           )}
         </div>
 
