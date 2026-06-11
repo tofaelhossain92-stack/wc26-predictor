@@ -21,12 +21,14 @@ export default function GameClient() {
   const [matches, setMatches]         = useState([])
   const [leaderboard, setLeaderboard] = useState([])
   const [loading, setLoading]         = useState(true)
+  const [userChecked, setUserChecked]   = useState(false)
 
   // Load user from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('wc26_user')
     if (!stored) { router.push('/'); return }
     setUser(JSON.parse(stored))
+    setUserChecked(true)
   }, [router])
 
   // Fetch matches from Supabase
@@ -82,7 +84,7 @@ export default function GameClient() {
     return () => clearTimeout(timer)
   }, [user])
 
-  if (!user || loading) return (
+  if (!userChecked || !user || loading) return (
     <div style={{ minHeight: '100vh', background: '#0a0f1e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="pulsing" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 16 }}>Loading...</div>
     </div>
