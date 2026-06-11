@@ -62,8 +62,16 @@ export default function GameClient() {
 
   // Live score polling — runs every 60s when a live match exists
   useEffect(() => {
-    const hasLive = matches.some(m => m.status === 'live')
+    const now = new Date()
+    const hasLive = matches.some(m => {
+      const kickoff = new Date(m.kickoff_time)
+      const kickoffPlus90 = new Date(kickoff.getTime() + 110 * 60 * 1000)
+      return m.status === 'live' || (m.status === 'upcoming' && now >= kickoff && now <= kickoffPlus90)
+    })
     if (!hasLive) return
+    // Sync immediately on load
+    fetch('/api/live-scores').then(() => fetchMatches())
+    // Then every 60s
     const interval = setInterval(async () => {
       await fetch('/api/live-scores')
       fetchMatches()
