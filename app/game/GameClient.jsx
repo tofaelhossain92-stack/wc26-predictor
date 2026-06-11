@@ -22,6 +22,7 @@ export default function GameClient() {
   const [leaderboard, setLeaderboard] = useState([])
   const [loading, setLoading]         = useState(true)
   const [userChecked, setUserChecked]   = useState(false)
+  const [notifGranted, setNotifGranted] = useState(false)
 
   // Load user from localStorage
   useEffect(() => {
@@ -29,6 +30,13 @@ export default function GameClient() {
     if (!stored) { router.push('/'); return }
     setUser(JSON.parse(stored))
     setUserChecked(true)
+    // Check if push already granted
+    if (window.OneSignalDeferred) {
+      window.OneSignalDeferred.push(async (OneSignal) => {
+        const permission = await OneSignal.Notifications.permission
+        setNotifGranted(!!permission)
+      })
+    }
   }, [router])
 
   // Fetch matches from Supabase
@@ -120,6 +128,20 @@ export default function GameClient() {
             <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 14 }}>{user.name}</div>
             <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>{currentPlayerData?.points || 0} pts</div>
           </div>
+          {!notifGranted && (
+            <button
+              onClick={() => {
+                if (window.OneSignalDeferred) {
+                  window.OneSignalDeferred.push(async (OneSignal) => {
+                    await OneSignal.Slidedown.promptPush()
+                    const permission = await OneSignal.Notifications.permission
+                    setNotifGranted(!!permission)
+                  })
+                }
+              }}
+              style={{ background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.3)', borderRadius: 8, padding: '6px 10px', color: '#f5c518', fontSize: 12, cursor: 'pointer' }}
+            >🔔</button>
+          )}
           <button
             onClick={() => { localStorage.removeItem('wc26_user'); router.push('/') }}
             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '6px 12px', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer' }}
