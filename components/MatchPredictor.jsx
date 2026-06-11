@@ -60,6 +60,10 @@ function MatchCard({ match, prediction, onPredict }) {
         }),
       })
       const data = await res.json()
+      if (res.status === 409) {
+        setSaved(true)
+        return
+      }
       if (!data.ok) throw new Error(data.error)
       setSaved(true)
       const r = REACTIONS[Math.floor(Math.random() * REACTIONS.length)]
