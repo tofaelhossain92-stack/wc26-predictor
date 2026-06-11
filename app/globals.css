@@ -59,3 +59,8 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
 .shake    { animation: shake 0.4s ease; }
 .pulsing  { animation: pulse 1.5s ease infinite; }
 .floating { animation: float 4s ease infinite; }
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}

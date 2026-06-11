@@ -8,6 +8,22 @@ function MatchCard({ match, prediction, onPredict }) {
   const [saved, setSaved]   = useState(!!prediction)
   const [error, setError]   = useState('')
   const [shake, setShake]   = useState(false)
+  const [reaction, setReaction] = useState(null)
+
+  const REACTIONS = [
+    { emoji: '🔥', text: "Absolute banger prediction!" },
+    { emoji: '💀', text: "Bold. Very bold." },
+    { emoji: '🤡', text: "Mate... really?" },
+    { emoji: '🧠', text: "Galaxy brain activated!" },
+    { emoji: '😂', text: "Good luck with that one lol" },
+    { emoji: '👀', text: "Interesting choice..." },
+    { emoji: '🎯', text: "Feeling confident are we?" },
+    { emoji: '🫡', text: "Locked and loaded!" },
+    { emoji: '💰', text: "Put money on that did ya?" },
+    { emoji: '🤔', text: "We'll see about that..." },
+    { emoji: '😤', text: "No fear. Respect." },
+    { emoji: '🐔', text: "Playing it safe I see..." },
+  ]
 
 
   // Only allow predictions on game day
@@ -46,6 +62,9 @@ function MatchCard({ match, prediction, onPredict }) {
       const data = await res.json()
       if (!data.ok) throw new Error(data.error)
       setSaved(true)
+      const r = REACTIONS[Math.floor(Math.random() * REACTIONS.length)]
+      setReaction(r)
+      setTimeout(() => setReaction(null), 2500)
       onPredict.refresh()
     } catch (err) {
       setError(err.message)
@@ -205,6 +224,25 @@ function MatchCard({ match, prediction, onPredict }) {
       {locked && match.status === 'live' && (
         <div style={{ textAlign: 'center', marginTop: 12, color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>
           🔴 Match in progress — predictions locked
+        </div>
+      )}
+
+      {/* Reaction popup */}
+      {reaction && (
+        <div style={{
+          position: 'fixed', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 999,
+          background: 'rgba(10,15,30,0.95)',
+          border: '1px solid rgba(245,197,24,0.4)',
+          borderRadius: 20, padding: '28px 36px',
+          textAlign: 'center',
+          animation: 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          boxShadow: '0 0 60px rgba(245,197,24,0.15)',
+        }}>
+          <div style={{ fontSize: 56, marginBottom: 10 }}>{reaction.emoji}</div>
+          <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 18 }}>{reaction.text}</div>
+          <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, marginTop: 6 }}>Prediction locked 🔒</div>
         </div>
       )}
     </div>
