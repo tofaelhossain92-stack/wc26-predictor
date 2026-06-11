@@ -72,6 +72,17 @@ export default function AdminPage() {
   const todayMatches  = matches.filter(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) === today)
   const otherMatches  = matches.filter(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) !== today)
 
+  async function notifyMatch(match) {
+    const res = await fetch('/api/admin/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matchId: match.id })
+    })
+    const data = await res.json()
+    if (data.ok) alert(`🔔 Notification sent for ${match.home_team} vs ${match.away_team}!`)
+    else alert('Failed to send notification')
+  }
+
   const renderMatch = (match) => (
     <div key={match.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '16px 20px', marginBottom: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -107,6 +118,11 @@ export default function AdminPage() {
         >
           {saving[match.id] ? 'Saving...' : 'Update ✓'}
         </button>
+        <button
+          onClick={() => notifyMatch(match)}
+          style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, color: '#fff', fontSize: 18, cursor: 'pointer' }}
+          title="Send 5-min warning notification"
+        >🔔</button>
       </div>
     </div>
   )
