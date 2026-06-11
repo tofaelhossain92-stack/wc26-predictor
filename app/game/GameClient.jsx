@@ -61,7 +61,7 @@ export default function GameClient() {
 
     const userSub = supabase
       .channel('users-channel')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users' }, () => fetchLeaderboard())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => fetchLeaderboard())
       .subscribe()
 
     return () => {
