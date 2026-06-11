@@ -3,6 +3,7 @@
 
 import { NextResponse } from 'next/server'
 import { supabase }     from '@/lib/supabase'
+import { sendPush }    from '@/lib/onesignal'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,6 +41,16 @@ export async function POST(request) {
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Push notification to all players
+    const senderName = data.user?.name || 'Someone'
+    const preview = content.trim().length > 60 ? content.trim().slice(0, 60) + '...' : content.trim()
+    sendPush({
+      title: `💬 ${senderName} posted on Trash Talk`,
+      message: preview,
+      url: '/game?tab=trash',
+    }).catch(() => {}) // fire and forget, don't block response
+
     return NextResponse.json({ ok: true, message: data })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
