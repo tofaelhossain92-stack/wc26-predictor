@@ -69,7 +69,7 @@ function MatchCard({ match, prediction, onPredict }) {
       const r = REACTIONS[Math.floor(Math.random() * REACTIONS.length)]
       setReaction(r)
       setTimeout(() => setReaction(null), 2500)
-      onPredict.refresh()
+      setTimeout(() => onPredict.refresh(), 800)
     } catch (err) {
       setError(err.message)
     } finally {
