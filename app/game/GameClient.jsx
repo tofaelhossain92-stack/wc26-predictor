@@ -60,6 +60,17 @@ export default function GameClient() {
     Promise.all([fetchMatches(), fetchLeaderboard()]).then(() => setLoading(false))
   }, [user, fetchMatches, fetchLeaderboard])
 
+  // Live score polling — runs every 60s when a live match exists
+  useEffect(() => {
+    const hasLive = matches.some(m => m.status === 'live')
+    if (!hasLive) return
+    const interval = setInterval(async () => {
+      await fetch('/api/live-scores')
+      fetchMatches()
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [matches, fetchMatches])
+
   // Realtime subscriptions
   useEffect(() => {
     const matchSub = supabase
