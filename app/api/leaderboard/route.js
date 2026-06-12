@@ -2,46 +2,29 @@
 // Returns all users sorted by points, with their full prediction history
 
 import { NextResponse } from 'next/server'
-import { supabase }     from '@/lib/supabase'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xtairnvavocsliewquhd.supabase.co'
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+async function sbGet(path) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    },
+    cache: 'no-store',
+  })
+  return res.json()
+}
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
     // Fetch all users sorted by points
-    const { data: users, error: usersError } = await supabase
-      .from('users')
-      .select('id, name, avatar, points, created_at')
-      .order('points', { ascending: false })
-
-    if (usersError) throw usersError
+    const users = await sbGet('users?select=id,name,avatar,points,created_at&order=points.desc')
 
     // Fetch all predictions with match details
-    const { data: predictions, error: predsError } = await supabase
-      .from('predictions')
-      .select(`
-        id,
-        user_id,
-        home_goals,
-        away_goals,
-        points_earned,
-        submitted_at,
-        match:matches (
-          id,
-          group_name,
-          home_team,
-          away_team,
-          home_flag,
-          away_flag,
-          kickoff_time,
-          status,
-          home_goals,
-          away_goals
-        )
-      `)
-      .order('submitted_at', { ascending: false })
-
-    if (predsError) throw predsError
+    const predictions = await sbGet('predictions?select=id,user_id,home_goals,away_goals,points_earned,submitted_at,match:matches(id,group_name,home_team,away_team,home_flag,away_flag,kickoff_time,status,home_goals,away_goals)&order=submitted_at.desc')
 
     // Attach predictions to each user
     const enriched = users.map(user => ({
