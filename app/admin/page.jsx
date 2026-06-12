@@ -22,11 +22,14 @@ export default function AdminPage() {
     const data = await res.json()
     if (data.ok) {
       setMatches(data.matches)
-      const init = {}
-      data.matches.forEach(m => {
-        init[m.id] = { home: m.home_goals ?? 0, away: m.away_goals ?? 0, status: m.status }
+      setScores(prev => {
+        const init = {}
+        data.matches.forEach(m => {
+          // Only set initial values, don't overwrite what user has typed
+          init[m.id] = prev[m.id] || { home: m.home_goals ?? 0, away: m.away_goals ?? 0, status: m.status }
+        })
+        return init
       })
-      setScores(init)
     }
   }
 
@@ -45,7 +48,6 @@ export default function AdminPage() {
       })
     })
     setSaving(s => ({ ...s, [match.id]: false }))
-    setTimeout(() => fetchMatches(), 1000)
   }
 
   if (!authed) return (
