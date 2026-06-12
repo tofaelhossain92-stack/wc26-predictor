@@ -45,7 +45,7 @@ export default function AdminPage() {
       })
     })
     setSaving(s => ({ ...s, [match.id]: false }))
-    fetchMatches()
+    setTimeout(() => fetchMatches(), 1000)
   }
 
   if (!authed) return (
