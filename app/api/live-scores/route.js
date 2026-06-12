@@ -1,6 +1,3 @@
-// GET /api/live-scores
-// Called by frontend every 60 seconds when a live match is detected
-
 import { NextResponse }  from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { mapStatus }     from '@/lib/football-api'
@@ -10,7 +7,6 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const now = new Date().toISOString()
-    // Also catch matches that have kicked off but status not yet updated
     const { data: liveMatches } = await supabaseAdmin
       .from('matches')
       .select('*')
@@ -33,11 +29,16 @@ export async function GET() {
 
       const homeGoals = apiMatch.score?.fullTime?.home ?? apiMatch.score?.halfTime?.home ?? 0
       const awayGoals = apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0
-      const status    = mapStatus(apiMatch.status)
+      const apiStatus = mapStatus(apiMatch.status)
+
+      // Never downgrade status — respect manual updates
+      const newStatus = match.status === 'done' ? 'done'
+        : match.status === 'live' && apiStatus === 'upcoming' ? 'live'
+        : apiStatus
 
       await supabaseAdmin
         .from('matches')
-        .update({ home_goals: homeGoals, away_goals: awayGoals, status })
+        .update({ home_goals: homeGoals, away_goals: awayGoals, status: newStatus })
         .eq('id', match.id)
 
       updated++
