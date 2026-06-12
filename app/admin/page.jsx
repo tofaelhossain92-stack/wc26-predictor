@@ -10,6 +10,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [matches, setMatches]   = useState([])
   const [saving, setSaving]     = useState({})
+  const [saved, setSaved]       = useState({})
   const [scores, setScores]     = useState({})
 
   function login() {
@@ -48,6 +49,8 @@ export default function AdminPage() {
       })
     })
     setSaving(s => ({ ...s, [match.id]: false }))
+    setSaved(s => ({ ...s, [match.id]: true }))
+    setTimeout(() => setSaved(s => ({ ...s, [match.id]: false })), 2000)
   }
 
   if (!authed) return (
@@ -118,7 +121,7 @@ export default function AdminPage() {
           disabled={saving[match.id]}
           style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg,#f5c518,#e6a800)', border: 'none', borderRadius: 10, color: '#0a0f1e', fontWeight: 700, fontSize: 14, cursor: 'pointer', opacity: saving[match.id] ? 0.6 : 1 }}
         >
-          {saving[match.id] ? 'Saving...' : 'Update ✓'}
+          {saving[match.id] ? 'Saving...' : saved[match.id] ? '✅ Saved!' : 'Update ✓'}
         </button>
         <button
           onClick={() => notifyMatch(match)}
