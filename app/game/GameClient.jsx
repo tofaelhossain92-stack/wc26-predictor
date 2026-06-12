@@ -41,11 +41,9 @@ export default function GameClient() {
 
   // Fetch matches from Supabase
   const fetchMatches = useCallback(async () => {
-    const { data } = await supabase
-      .from('matches')
-      .select('*')
-      .order('kickoff_time', { ascending: true })
-    if (data) setMatches(data)
+    const res = await fetch('/api/matches', { cache: 'no-store' })
+    const data = await res.json()
+    if (data.ok) setMatches(data.matches)
   }, [])
 
   // Fetch leaderboard
