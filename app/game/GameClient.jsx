@@ -68,12 +68,9 @@ export default function GameClient() {
     })
     if (!hasLive) return
     // Sync immediately on load
-    fetch('/api/live-scores').then(() => setTimeout(() => fetchMatches(), 1000))
-    // Then every 30s
-    const interval = setInterval(async () => {
-      await fetch('/api/live-scores')
-      setTimeout(() => fetchMatches(), 1000)
-    }, 30000)
+    fetchMatches()
+    // Then every 15s
+    const interval = setInterval(() => fetchMatches(), 15000)
     return () => clearInterval(interval)
   }, [matches, fetchMatches])
 
