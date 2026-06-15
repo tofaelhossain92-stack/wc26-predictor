@@ -101,14 +101,16 @@ export async function GET() {
       if (apiMatch.status === 'PAUSED') {
         matchPeriod = 'HT'
       } else if (apiMatch.status === 'IN_PLAY') {
-        // Account for ~15 min halftime break
-        // 1st half: elapsed 0-50 mins = match minute 0-45
-        // Halftime: elapsed 50-65 = show 45+
-        // 2nd half: elapsed 65-115 = match minute 46-90
-        if (elapsedMins <= 50) matchPeriod = `${Math.min(elapsedMins, 45)}'`
-        else if (elapsedMins <= 65) matchPeriod = `45+'`
-        else if (elapsedMins <= 115) matchPeriod = `${Math.min(elapsedMins - 20, 90)}'`
-        else matchPeriod = `90+'`
+        // Halftime break is ~22 mins (15 official + warmup time)
+        // 1st half: elapsed 0-47 mins = minute 0-45
+        // Around HT: elapsed 47-62 = show 45+
+        // 2nd half: elapsed 62+ = minute = elapsed - 22
+        if (elapsedMins <= 47) matchPeriod = `${Math.min(elapsedMins, 45)}'`
+        else if (elapsedMins <= 62) matchPeriod = `45+'`
+        else {
+          const min2nd = elapsedMins - 22
+          matchPeriod = min2nd <= 90 ? `${min2nd}'` : `90+'`
+        }
       } else if (apiMatch.status === 'FINISHED') {
         matchPeriod = 'FT'
       }
@@ -129,7 +131,7 @@ export async function GET() {
       // Only add new goals (compare actual count vs recorded count)
       const homeGoalCount = goalTimes.filter(g => g.team === 'home').length
       const awayGoalCount = goalTimes.filter(g => g.team === 'away').length
-      const mins = elapsedMins <= 50 ? Math.min(elapsedMins, 45) : elapsedMins <= 65 ? 45 : Math.min(elapsedMins - 20, 90)
+      const mins = elapsedMins <= 47 ? Math.min(elapsedMins, 45) : elapsedMins <= 62 ? 45 : Math.min(elapsedMins - 22, 90)
       
       if (homeGoals > homeGoalCount) {
         for (let i = 0; i < homeGoals - homeGoalCount; i++) {
