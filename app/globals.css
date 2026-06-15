@@ -64,3 +64,59 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
+
+/* ── Match Card Glow Effects ─────────────────────────────────── */
+
+/* Live card pulse glow */
+@keyframes liveGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,74,74,0.15), 0 0 60px rgba(255,74,74,0.05), 0 8px 32px rgba(0,0,0,0.4); }
+  50%       { box-shadow: 0 0 35px rgba(255,74,74,0.3),  0 0 80px rgba(255,74,74,0.1), 0 8px 32px rgba(0,0,0,0.4); }
+}
+
+/* Done card shimmer */
+@keyframes doneGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(245,197,24,0.1), 0 8px 32px rgba(0,0,0,0.4); }
+  50%       { box-shadow: 0 0 40px rgba(245,197,24,0.2), 0 8px 32px rgba(0,0,0,0.4); }
+}
+
+/* Score pulse on live */
+@keyframes scorePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
+}
+
+/* Card hover lift */
+.match-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.match-card:hover {
+  transform: translateY(-2px);
+}
+
+.match-card-live {
+  animation: liveGlow 2s ease-in-out infinite;
+}
+
+.match-card-done {
+  animation: doneGlow 3s ease-in-out infinite;
+}
+
+.score-live {
+  animation: scorePulse 1.5s ease-in-out infinite;
+}
+
+/* Shimmer sweep on done cards */
+.match-card-done::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(245,197,24,0.04), transparent);
+  animation: shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  50%, 100% { left: 150%; }
+}
