@@ -12,6 +12,10 @@ export default function AdminPage() {
   const [saving, setSaving]     = useState({})
   const [saved, setSaved]       = useState({})
   const [syncing, setSyncing]   = useState({})
+  const [notifTitle, setNotifTitle] = useState('')
+  const [notifMsg, setNotifMsg]     = useState('')
+  const [notifSending, setNotifSending] = useState(false)
+  const [notifSent, setNotifSent]   = useState(false)
   const [scores, setScores]     = useState({})
 
   function login() {
@@ -77,6 +81,29 @@ export default function AdminPage() {
   const today = new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
   const todayMatches  = matches.filter(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) === today)
   const otherMatches  = matches.filter(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) !== today)
+
+  async function sendCustomNotif() {
+    if (!notifTitle.trim() || !notifMsg.trim()) {
+      alert('Please enter both title and message')
+      return
+    }
+    setNotifSending(true)
+    const res = await fetch('/api/admin/send-notification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer wc26cron2026' },
+      body: JSON.stringify({ title: notifTitle, message: notifMsg, url: '/game' })
+    })
+    const data = await res.json()
+    setNotifSending(false)
+    if (data.ok) {
+      setNotifSent(true)
+      setNotifTitle('')
+      setNotifMsg('')
+      setTimeout(() => setNotifSent(false), 3000)
+    } else {
+      alert('Failed to send: ' + (data.error || 'Unknown error'))
+    }
+  }
 
   async function syncMatch(match) {
     if (!match.api_match_id) {
@@ -167,6 +194,32 @@ export default function AdminPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div style={{ color: '#fff', fontWeight: 700, fontSize: 20 }}>⚽ Score Admin</div>
           <button onClick={() => router.push('/game')} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '6px 14px', color: 'rgba(255,255,255,0.5)', fontSize: 13, cursor: 'pointer' }}>← Back</button>
+        </div>
+
+        {/* Custom Notification */}
+        <div style={{ background: 'rgba(245,197,24,0.06)', border: '1px solid rgba(245,197,24,0.2)', borderRadius: 16, padding: '20px', marginBottom: 24 }}>
+          <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 14, marginBottom: 14 }}>📣 Send Custom Notification</div>
+          <input
+            type="text"
+            placeholder="Title e.g. 🏆 Oi, get predicting!"
+            value={notifTitle}
+            onChange={e => setNotifTitle(e.target.value)}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 14, marginBottom: 10, boxSizing: 'border-box', outline: 'none' }}
+          />
+          <textarea
+            placeholder="Message e.g. Today's matches won't predict themselves 😤"
+            value={notifMsg}
+            onChange={e => setNotifMsg(e.target.value)}
+            rows={3}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: 14, marginBottom: 12, boxSizing: 'border-box', outline: 'none', resize: 'none' }}
+          />
+          <button
+            onClick={sendCustomNotif}
+            disabled={notifSending}
+            style={{ width: '100%', padding: '12px', background: notifSent ? 'rgba(0,200,150,0.3)' : 'linear-gradient(135deg,#f5c518,#e6a800)', border: 'none', borderRadius: 10, color: notifSent ? '#00c896' : '#0a0f1e', fontWeight: 700, fontSize: 15, cursor: notifSending ? 'not-allowed' : 'pointer', opacity: notifSending ? 0.7 : 1 }}
+          >
+            {notifSending ? 'Sending...' : notifSent ? '✅ Sent to everyone!' : '📣 Send to All Players'}
+          </button>
         </div>
 
         {todayMatches.length > 0 && (
