@@ -3,12 +3,17 @@ import { useState } from 'react'
 
 function safeParseJSON(val) {
   if (!val) return null
+  if (Array.isArray(val)) return val
   if (typeof val === 'object') return val
-  try { return JSON.parse(val) } catch { return null }
+  try { 
+    const parsed = JSON.parse(val)
+    return parsed
+  } catch { return null }
 }
 
 function LiveMatchInfo({ match }) {
-  const goalTimes = safeParseJSON(match.goal_times) || []
+  const rawGoals = safeParseJSON(match.goal_times)
+  const goalTimes = Array.isArray(rawGoals) ? rawGoals : []
   const prob = safeParseJSON(match.win_prob)
 
   return (
