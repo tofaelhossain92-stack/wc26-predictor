@@ -7,12 +7,14 @@ import MatchPredictor from '@/components/MatchPredictor'
 import Leaderboard   from '@/components/Leaderboard'
 import TrashTalk     from '@/components/TrashTalk'
 import Standings     from '@/components/Standings'
+import Profile      from '@/components/Profile'
 
 const TABS = [
-  { id: 'predict',     label: '⚽ Predict' },
-  { id: 'standings',   label: '📊 Standings' },
-  { id: 'leaderboard', label: '🏅 Leaderboard' },
-  { id: 'trash',       label: '💬 Trash Talk' },
+  { id: 'predict',     label: 'Predict',     icon: '⚽' },
+  { id: 'standings',   label: 'Standings',   icon: '📊' },
+  { id: 'leaderboard', label: 'Leaders',     icon: '🏅' },
+  { id: 'trash',       label: 'Trash',       icon: '💬' },
+  { id: 'profile',     label: 'Profile',     icon: '👤' },
 ]
 
 export default function GameClient() {
@@ -165,28 +167,41 @@ export default function GameClient() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{
-        display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.07)',
-        background: 'rgba(10,15,30,0.6)', position: 'sticky', top: 57, zIndex: 99,
-      }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            flex: 1, padding: '14px 8px', background: 'none',
-            border: 'none', borderBottom: tab === t.id ? '2px solid #f5c518' : '2px solid transparent',
-            color: tab === t.id ? '#f5c518' : 'rgba(255,255,255,0.35)',
-            fontSize: 13, fontWeight: tab === t.id ? 700 : 400, cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}>{t.label}</button>
-        ))}
-      </div>
+      {/* Bottom padding for nav bar */}
+      <div style={{ height: 70 }} />
 
       {/* Content */}
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px' }}>
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px 100px 16px' }}>
         {tab === 'predict'     && <MatchPredictor matches={matches} user={user} leaderboard={leaderboard} onPredicted={fetchLeaderboard} />}
         {tab === 'standings'   && <Standings matches={matches} />}
         {tab === 'leaderboard' && <Leaderboard leaderboard={leaderboard} currentUserId={user.id} />}
         {tab === 'trash'       && <TrashTalk user={user} />}
+        {tab === 'profile'     && <Profile user={user} matches={matches} leaderboard={leaderboard} />}
+      </div>
+      {/* Bottom Nav Bar */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
+        background: 'rgba(4,10,20,0.96)', backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        display: 'flex', padding: '8px 0 max(8px, env(safe-area-inset-bottom)) 0',
+      }}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+            background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
+            transition: 'all 0.15s',
+          }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>{t.icon}</span>
+            <span style={{
+              fontSize: 10, fontWeight: tab === t.id ? 700 : 400,
+              color: tab === t.id ? '#C9A84C' : 'rgba(255,255,255,0.35)',
+              letterSpacing: 0.3,
+            }}>{t.label}</span>
+            {tab === t.id && (
+              <div style={{ position: 'absolute', bottom: 0, width: 4, height: 4, borderRadius: '50%', background: '#C9A84C' }} />
+            )}
+          </button>
+        ))}
       </div>
     </div>
   )
