@@ -76,19 +76,28 @@ function MatchCard({ match, prediction, onPredict }) {
   const dateStr = kickoff.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
   const timeStr = kickoff.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
 
+  const cardBorder = match.status === 'done' ? 'rgba(245,197,24,0.2)' 
+    : match.status === 'live' ? 'rgba(255,74,74,0.3)' 
+    : saved ? 'rgba(245,197,24,0.25)' 
+    : 'rgba(255,255,255,0.08)'
+  
+  const cardGlow = match.status === 'done' ? '0 0 40px rgba(245,197,24,0.05), 0 8px 32px rgba(0,0,0,0.4)'
+    : match.status === 'live' ? '0 0 40px rgba(255,74,74,0.05), 0 8px 32px rgba(0,0,0,0.4)'
+    : '0 4px 24px rgba(0,0,0,0.3)'
+
   return (
     <div className={shake ? 'shake' : ''} style={{
-      background: isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.03)',
-      border: `1px solid ${saved ? 'rgba(245,197,24,0.3)' : isFuture ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)'}`,
-      borderRadius: 16, padding: '20px 24px', marginBottom: 12,
-      boxShadow: saved ? '0 0 20px rgba(245,197,24,0.07)' : 'none',
+      background: 'linear-gradient(135deg, rgba(15,25,45,0.98), rgba(10,18,35,1))',
+      border: `1px solid ${cardBorder}`,
+      borderRadius: 20, padding: '20px 24px', marginBottom: 14,
+      boxShadow: cardGlow,
       transition: 'all 0.3s',
-      opacity: 1,
+      position: 'relative', overflow: 'hidden',
     }}>
       {/* Match header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ background: 'rgba(74,158,255,0.15)', color: '#4a9eff', border: '1px solid rgba(74,158,255,0.25)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>
+          <span style={{ background: 'rgba(74,158,255,0.15)', color: '#4a9eff', border: '1px solid rgba(74,158,255,0.25)', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>
             GROUP {match.group_name}
           </span>
           {match.status === 'live' && (
@@ -119,8 +128,8 @@ function MatchCard({ match, prediction, onPredict }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center' }}>
         {/* Home */}
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 28, marginBottom: 4 }}>{match.home_flag}</div>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, marginBottom: 10 }}>{match.home_team}</div>
+          <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.home_team}</div>
           <input
             type="number" min={0} max={20}
             value={homeG}
@@ -128,10 +137,10 @@ function MatchCard({ match, prediction, onPredict }) {
             disabled={locked || saved || isFuture}
             placeholder="0"
             style={{
-              width: 64, height: 64, textAlign: 'center', fontSize: 28, fontWeight: 700,
+              width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
               background: locked || saved || isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.08)',
               border: '2px solid rgba(255,255,255,0.12)',
-              borderRadius: 12, color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
+              borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
               cursor: isFuture ? 'not-allowed' : 'auto',
             }}
           />
@@ -151,19 +160,22 @@ function MatchCard({ match, prediction, onPredict }) {
             </div>
           )}
           {(match.status === 'done' || match.status === 'live') && match.home_goals != null && (
-            <div style={{ color: match.status === 'live' ? '#ff4a4a' : '#f5c518', fontSize: 22, fontWeight: 700, margin: '4px 0' }}>
+            <div style={{ color: match.status === 'live' ? '#ff4a4a' : '#f5c518', fontSize: 42, fontWeight: 900, margin: '4px 0', letterSpacing: '-1px', textShadow: match.status === 'live' ? '0 0 20px rgba(255,74,74,0.3)' : '0 0 20px rgba(245,197,24,0.3)' }}>
               {match.home_goals}–{match.away_goals}
             </div>
           )}
           {match.status === 'live' && (
-            <div className="pulsing" style={{ color: '#ff4a4a', fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>LIVE</div>
+            <div className="pulsing" style={{ color: 'rgba(255,74,74,0.7)', fontSize: 11, fontWeight: 700, letterSpacing: 1, marginTop: 4 }}>● IN PLAY</div>
+          )}
+          {match.status === 'done' && (
+            <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>FULL TIME</div>
           )}
         </div>
 
         {/* Away */}
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 28, marginBottom: 4 }}>{match.away_flag}</div>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, marginBottom: 10 }}>{match.away_team}</div>
+          <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.away_team}</div>
           <input
             type="number" min={0} max={20}
             value={awayG}
@@ -171,10 +183,10 @@ function MatchCard({ match, prediction, onPredict }) {
             disabled={locked || saved || isFuture}
             placeholder="0"
             style={{
-              width: 64, height: 64, textAlign: 'center', fontSize: 28, fontWeight: 700,
+              width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
               background: locked || saved || isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.08)',
               border: '2px solid rgba(255,255,255,0.12)',
-              borderRadius: 12, color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
+              borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
               cursor: isFuture ? 'not-allowed' : 'auto',
             }}
           />
@@ -186,16 +198,19 @@ function MatchCard({ match, prediction, onPredict }) {
         </div>
       </div>
 
+      {/* Divider */}
+      {(match.status === 'done' || match.status === 'live') && (
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '16px 0' }}></div>
+      )}
+
       {/* Points earned */}
       {match.status === 'done' && prediction && (
         <div style={{
-          marginTop: 14, padding: '10px 16px', borderRadius: 10, textAlign: 'center',
-          background: prediction.pointsEarned > 0 ? 'rgba(0,200,150,0.1)' : 'rgba(255,255,255,0.04)',
-          border: `1px solid ${prediction.pointsEarned > 0 ? 'rgba(0,200,150,0.25)' : 'rgba(255,255,255,0.08)'}`,
+          padding: '0', borderRadius: 10, textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           {prediction.pointsEarned > 0
-            ? <span style={{ color: '#00c896', fontWeight: 700 }}>+{prediction.pointsEarned} pts earned! 🎉 Your pick: {prediction.predictedHome}–{prediction.predictedAway}</span>
-            : <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>Your pick: {prediction.predictedHome}–{prediction.predictedAway} · 0 pts 😅</span>
+            ? (<><span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Your pick: <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{prediction.predictedHome}–{prediction.predictedAway}</strong></span><span style={{ background: 'linear-gradient(135deg, rgba(0,200,150,0.15), rgba(0,200,150,0.05))', border: '1px solid rgba(0,200,150,0.3)', borderRadius: 20, padding: '4px 14px', color: '#00c896', fontSize: 13, fontWeight: 700 }}>{prediction.pointsEarned === 10 ? '🎯' : '✓'} +{prediction.pointsEarned} pts{prediction.pointsEarned === 10 ? ' — Perfect!' : ''}</span></>) 
+            : (<><span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>Your pick: <strong style={{ color: 'rgba(255,255,255,0.5)' }}>{prediction.predictedHome}–{prediction.predictedAway}</strong></span><span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 12 }}>0 pts 😅</span></>)
           }
         </div>
       )}
@@ -207,11 +222,12 @@ function MatchCard({ match, prediction, onPredict }) {
         <>
           {error && <div style={{ color: '#ff4a4a', fontSize: 12, marginTop: 10, textAlign: 'center' }}>{error}</div>}
           <button onClick={handleSave} disabled={saving} style={{
-            width: '100%', marginTop: 14, padding: 11,
+            width: '100%', marginTop: 18, padding: 14,
             background: 'linear-gradient(135deg,#f5c518,#e6a800)',
-            border: 'none', borderRadius: 10, color: '#0a0f1e',
-            fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer',
+            border: 'none', borderRadius: 12, color: '#0a0f1e',
+            fontSize: 15, fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer',
             opacity: saving ? 0.7 : 1, transition: 'all 0.2s',
+            boxShadow: '0 4px 16px rgba(245,197,24,0.3)',
           }}>
             {saving ? 'Saving...' : 'Lock In Prediction 🔒'}
           </button>
