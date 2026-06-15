@@ -167,8 +167,7 @@ export default function GameClient() {
         </div>
       </div>
 
-      {/* Bottom padding for nav bar */}
-      <div style={{ height: 70 }} />
+
 
       {/* Content */}
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px 100px 16px' }}>
