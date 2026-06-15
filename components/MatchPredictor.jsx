@@ -19,30 +19,11 @@ function LiveMatchInfo({ match }) {
   return (
     <>
       {goalTimes.length > 0 && (
-        <div style={{ marginTop: 14 }}>
-          {/* Show goals in a 3-column layout: home | center | away */}
+        <div style={{ marginTop: 14, padding: '0 4px' }}>
           {goalTimes.map((g, i) => (
-            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 8, alignItems: 'center', padding: '3px 0' }}>
-              {/* Home goal */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6 }}>
-                {g.team === 'home' ? (
-                  <>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 8px' }}>{g.min}'</span>
-                    <span style={{ fontSize: 13 }}>⚽</span>
-                  </>
-                ) : null}
-              </div>
-              {/* Center dot */}
-              <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', margin: '0 auto' }} />
-              {/* Away goal */}
-              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 6 }}>
-                {g.team === 'away' ? (
-                  <>
-                    <span style={{ fontSize: 13 }}>⚽</span>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 8px' }}>{g.min}'</span>
-                  </>
-                ) : null}
-              </div>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0', flexDirection: g.team === 'away' ? 'row-reverse' : 'row' }}>
+              <span style={{ fontSize: 13 }}>⚽</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 8px' }}>{g.min}'</span>
             </div>
           ))}
         </div>
@@ -372,6 +353,9 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
     const today = new Date()
     return today.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
   })
+
+  // Auto-switch to 'All' if no matches on today's date  
+  const todayStr = new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
 
   const myData    = leaderboard.find(p => p.id === user.id)
   const myPredMap = {}
