@@ -1,4 +1,4 @@
-name: Match Notifications
+name: WC26 Match Automation
 
 on:
   schedule:
@@ -8,11 +8,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  notify:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Check and notify upcoming matches
+      - name: Sync live scores & settle finished matches
         run: |
-          curl -s -X POST https://wc26-predictor-pi.vercel.app/api/cron/notify-upcoming \
+          curl -s "https://wc26-predictor-pi.vercel.app/api/live-scores"
+
+      - name: Notify upcoming matches (10 min warning)
+        run: |
+          curl -s -X POST "https://wc26-predictor-pi.vercel.app/api/cron/notify-upcoming" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
