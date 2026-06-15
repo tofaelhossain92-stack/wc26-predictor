@@ -109,7 +109,7 @@ function MatchCard({ match, prediction, onPredict }) {
           </span>
           {match.status === 'live' && (
             <span className="pulsing" style={{ background: 'rgba(200,16,46,0.15)', color: '#C8102E', border: '1px solid rgba(200,16,46,0.4)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>
-              🔴 LIVE
+              🔴 {match.match_period === 'HT' ? 'HALF TIME' : match.match_period ? `LIVE ${match.match_period}` : 'LIVE'}
             </span>
           )}
           {match.status === 'done' && (
@@ -177,10 +177,21 @@ function MatchCard({ match, prediction, onPredict }) {
             </div>
           )}
           {match.status === 'live' && (
-            <div className="pulsing" style={{ color: '#C8102E', fontSize: 11, fontWeight: 700, letterSpacing: 1, marginTop: 4, textShadow: '0 0 8px rgba(200,16,46,0.5)' }}>● IN PLAY</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, marginTop: 6 }}>
+              {match.match_period === 'HT' ? (
+                <span style={{ background: 'rgba(255,165,0,0.15)', border: '1px solid rgba(255,165,0,0.4)', borderRadius: 20, padding: '3px 12px', color: '#FFA500', fontSize: 12, fontWeight: 800, letterSpacing: 1 }}>⏸ HALF TIME</span>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span className="pulsing" style={{ color: '#C8102E', fontSize: 11, fontWeight: 700 }}>●</span>
+                  <span style={{ color: '#C8102E', fontSize: 13, fontWeight: 800, textShadow: '0 0 8px rgba(200,16,46,0.5)' }}>{match.match_period || 'LIVE'}</span>
+                </div>
+              )}
+            </div>
           )}
           {match.status === 'done' && (
-            <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>FULL TIME</div>
+            <div style={{ marginTop: 6 }}>
+              <span style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 20, padding: '3px 12px', color: '#C9A84C', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>✓ FULL TIME</span>
+            </div>
           )}
         </div>
 
