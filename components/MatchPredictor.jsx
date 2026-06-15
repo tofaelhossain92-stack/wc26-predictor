@@ -134,7 +134,7 @@ function MatchCard({ match, prediction, onPredict }) {
       {/* Teams */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 12, alignItems: 'center' }}>
         {/* Home */}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.home_team}</div>
           {(saved || locked) && homeG !== '' ? (
@@ -185,7 +185,7 @@ function MatchCard({ match, prediction, onPredict }) {
         </div>
 
         {/* Away */}
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.away_team}</div>
           {(saved || locked) && awayG !== '' ? (
