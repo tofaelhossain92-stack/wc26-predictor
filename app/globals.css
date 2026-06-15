@@ -120,3 +120,69 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   0%   { left: -100%; }
   50%, 100% { left: 150%; }
 }
+
+/* ── WC26 World Cup Theme Colors ─────────────────────────────── */
+:root {
+  --wc-gold:        #C9A84C;   /* Championship gold */
+  --wc-gold-light:  #F0C040;   /* Bright trophy gold */
+  --wc-crimson:     #C8102E;   /* FIFA red */
+  --wc-navy:        #002868;   /* Deep USA navy */
+  --wc-green:       #006847;   /* Mexico green */
+  --wc-white:       #F8F8F8;   /* Pure white */
+  --wc-silver:      #A8A9AD;   /* Silver/runner up */
+}
+
+/* Live card — crimson red pulse (match in progress) */
+@keyframes liveGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(200,16,46,0.2), 0 0 60px rgba(200,16,46,0.06), 0 8px 32px rgba(0,0,0,0.5); border-color: rgba(200,16,46,0.4); }
+  50%       { box-shadow: 0 0 40px rgba(200,16,46,0.4), 0 0 90px rgba(200,16,46,0.12), 0 8px 32px rgba(0,0,0,0.5); border-color: rgba(200,16,46,0.7); }
+}
+
+/* Done card — championship gold shimmer */
+@keyframes doneGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(201,168,76,0.15), 0 8px 32px rgba(0,0,0,0.5); border-color: rgba(201,168,76,0.3); }
+  50%       { box-shadow: 0 0 50px rgba(201,168,76,0.3),  0 8px 32px rgba(0,0,0,0.5); border-color: rgba(201,168,76,0.6); }
+}
+
+/* Score pulse for live */
+@keyframes scorePulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(200,16,46,0.5); }
+  50%       { opacity: 0.8; text-shadow: 0 0 35px rgba(200,16,46,0.8); }
+}
+
+/* Gold shimmer sweep */
+@keyframes shimmer {
+  0%        { left: -100%; }
+  50%, 100% { left: 150%; }
+}
+
+/* Card hover lift */
+.match-card {
+  transition: transform 0.25s ease;
+}
+.match-card:hover {
+  transform: translateY(-3px);
+}
+
+.match-card-live {
+  animation: liveGlow 2s ease-in-out infinite;
+}
+
+.match-card-done {
+  animation: doneGlow 3s ease-in-out infinite;
+}
+
+.score-live {
+  animation: scorePulse 1.5s ease-in-out infinite;
+}
+
+/* Gold shimmer on done */
+.match-card-done::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.06), transparent);
+  animation: shimmer 5s ease-in-out infinite;
+  pointer-events: none;
+}
