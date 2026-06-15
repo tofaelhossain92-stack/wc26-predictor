@@ -1,12 +1,12 @@
 // GET /api/live-scores
 // Called by frontend every 15s when a live/upcoming match is detected
 // Fetches real scores from football-data.org and updates DB
-// Also settles predictions when a match finishes
+// Sends goal notifications, auto-settles predictions when match finishes
 
 import { NextResponse } from 'next/server'
 import { mapStatus }    from '@/lib/football-api'
 import { calcPoints }   from '@/lib/points'
-import { notifyResultIn } from '@/lib/onesignal'
+import { notifyResultIn, sendPush } from '@/lib/onesignal'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,6 +51,15 @@ async function settleMatch(matchId, homeGoals, awayGoals, match) {
   ).catch(() => {})
 }
 
+function getGoalTeam(match, prevHome, prevAway, newHome, newAway) {
+  const homeScored = newHome > prevHome
+  const awayScored = newAway > prevAway
+  if (homeScored && awayScored) return null // both scored simultaneously, rare
+  if (homeScored) return { team: match.home_team, flag: match.home_flag, score: `${newHome}–${newAway}` }
+  if (awayScored) return { team: match.away_team, flag: match.away_flag, score: `${newHome}–${newAway}` }
+  return null
+}
+
 export async function GET() {
   try {
     const now = new Date().toISOString()
@@ -84,12 +93,29 @@ export async function GET() {
       const awayGoals = apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0
       const newStatus = mapStatus(apiMatch.status)
 
-      // Update match
+      // Detect goal — compare with previous DB score
+      const prevHome = match.home_goals ?? 0
+      const prevAway = match.away_goals ?? 0
+      const goalScored = (homeGoals > prevHome || awayGoals > prevAway) && newStatus === 'live'
+
+      // Update match in DB
       await sbPatch(`matches?id=eq.${match.id}`, {
         home_goals: homeGoals,
         away_goals: awayGoals,
         status: newStatus
       })
+
+      // Send goal notification
+      if (goalScored) {
+        const goalInfo = getGoalTeam(match, prevHome, prevAway, homeGoals, awayGoals)
+        if (goalInfo) {
+          await sendPush({
+            title: `⚽ GOAL! ${goalInfo.flag} ${goalInfo.team}!`,
+            message: `${match.home_flag} ${match.home_team} ${goalInfo.score} ${match.away_team} ${match.away_flag}`,
+            url: '/game?tab=predict',
+          }).catch(() => {})
+        }
+      }
 
       // If just finished, settle predictions and notify
       if (newStatus === 'done' && match.status !== 'done') {
