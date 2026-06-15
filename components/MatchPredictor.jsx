@@ -76,9 +76,9 @@ function MatchCard({ match, prediction, onPredict }) {
   const dateStr = kickoff.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
   const timeStr = kickoff.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
 
-  const cardBorder = match.status === 'done' ? 'rgba(245,197,24,0.2)' 
-    : match.status === 'live' ? 'rgba(255,74,74,0.3)' 
-    : saved ? 'rgba(245,197,24,0.25)' 
+  const cardBorder = match.status === 'done' ? 'rgba(201,168,76,0.3)'   // championship gold
+    : match.status === 'live' ? 'rgba(200,16,46,0.4)'   // FIFA crimson
+    : saved ? 'rgba(201,168,76,0.25)'                    // gold when locked in
     : 'rgba(255,255,255,0.08)'
   
   const cardGlow = match.status === 'done' ? '0 0 40px rgba(245,197,24,0.05), 0 8px 32px rgba(0,0,0,0.4)'
@@ -96,10 +96,10 @@ function MatchCard({ match, prediction, onPredict }) {
       }}>
       {/* Glow overlay */}
       {match.status === 'live' && (
-        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(255,74,74,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(200,16,46,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
       )}
       {match.status === 'done' && (
-        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(245,197,24,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
       )}
       {/* Match header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -108,7 +108,7 @@ function MatchCard({ match, prediction, onPredict }) {
             GROUP {match.group_name}
           </span>
           {match.status === 'live' && (
-            <span className="pulsing" style={{ background: 'rgba(255,74,74,0.15)', color: '#ff4a4a', border: '1px solid rgba(255,74,74,0.25)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>
+            <span className="pulsing" style={{ background: 'rgba(200,16,46,0.15)', color: '#C8102E', border: '1px solid rgba(200,16,46,0.4)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>
               🔴 LIVE
             </span>
           )}
@@ -138,7 +138,7 @@ function MatchCard({ match, prediction, onPredict }) {
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.home_team}</div>
           {(saved || locked) && homeG !== '' ? (
-            <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#f5c518', background: 'rgba(255,255,255,0.04)', borderRadius: 16, border: '2px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {homeG}
             </div>
           ) : (
@@ -151,8 +151,8 @@ function MatchCard({ match, prediction, onPredict }) {
               style={{
                 width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
                 background: 'rgba(255,255,255,0.08)',
-                border: '2px solid rgba(255,255,255,0.15)',
-                borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: '#f5c518', outline: 'none',
+                border: '2px solid rgba(201,168,76,0.3)',
+                borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: '#C9A84C', outline: 'none',
               }}
             />
           )}
@@ -172,12 +172,12 @@ function MatchCard({ match, prediction, onPredict }) {
             </div>
           )}
           {(match.status === 'done' || match.status === 'live') && match.home_goals != null && (
-            <div className={match.status === 'live' ? 'score-live' : ''} style={{ color: match.status === 'live' ? '#ff4a4a' : '#f5c518', fontSize: 42, fontWeight: 900, margin: '4px 0', letterSpacing: '-1px', textShadow: match.status === 'live' ? '0 0 20px rgba(255,74,74,0.3)' : '0 0 20px rgba(245,197,24,0.3)' }}>
+            <div className={match.status === 'live' ? 'score-live' : ''} style={{ color: match.status === 'live' ? '#C8102E' : '#C9A84C', fontSize: 42, fontWeight: 900, margin: '4px 0', letterSpacing: '-1px', textShadow: match.status === 'live' ? '0 0 25px rgba(200,16,46,0.5)' : '0 0 25px rgba(201,168,76,0.4)' }}>
               {match.home_goals}–{match.away_goals}
             </div>
           )}
           {match.status === 'live' && (
-            <div className="pulsing" style={{ color: 'rgba(255,74,74,0.7)', fontSize: 11, fontWeight: 700, letterSpacing: 1, marginTop: 4 }}>● IN PLAY</div>
+            <div className="pulsing" style={{ color: '#C8102E', fontSize: 11, fontWeight: 700, letterSpacing: 1, marginTop: 4, textShadow: '0 0 8px rgba(200,16,46,0.5)' }}>● IN PLAY</div>
           )}
           {match.status === 'done' && (
             <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, fontWeight: 600, letterSpacing: 1, marginTop: 4 }}>FULL TIME</div>
@@ -189,7 +189,7 @@ function MatchCard({ match, prediction, onPredict }) {
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.away_team}</div>
           {(saved || locked) && awayG !== '' ? (
-            <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#f5c518', background: 'rgba(255,255,255,0.04)', borderRadius: 16, border: '2px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {awayG}
             </div>
           ) : (
@@ -202,8 +202,8 @@ function MatchCard({ match, prediction, onPredict }) {
               style={{
                 width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
                 background: 'rgba(255,255,255,0.08)',
-                border: '2px solid rgba(255,255,255,0.15)',
-                borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: '#f5c518', outline: 'none',
+                border: '2px solid rgba(201,168,76,0.3)',
+                borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: '#C9A84C', outline: 'none',
               }}
             />
           )}
@@ -226,7 +226,7 @@ function MatchCard({ match, prediction, onPredict }) {
           padding: '0', borderRadius: 10, textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           {prediction.pointsEarned > 0
-            ? (<><span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Your pick: <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{prediction.predictedHome}–{prediction.predictedAway}</strong></span><span style={{ background: 'linear-gradient(135deg, rgba(0,200,150,0.15), rgba(0,200,150,0.05))', border: '1px solid rgba(0,200,150,0.3)', borderRadius: 20, padding: '4px 14px', color: '#00c896', fontSize: 13, fontWeight: 700 }}>{prediction.pointsEarned === 10 ? '🎯' : '✓'} +{prediction.pointsEarned} pts{prediction.pointsEarned === 10 ? ' — Perfect!' : ''}</span></>) 
+            ? (<><span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Your pick: <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{prediction.predictedHome}–{prediction.predictedAway}</strong></span><span style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.05))', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 20, padding: '4px 14px', color: '#C9A84C', fontSize: 13, fontWeight: 700 }}>{prediction.pointsEarned === 10 ? '🎯' : '✓'} +{prediction.pointsEarned} pts{prediction.pointsEarned === 10 ? ' — Perfect!' : ''}</span></>) 
             : (<><span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>Your pick: <strong style={{ color: 'rgba(255,255,255,0.5)' }}>{prediction.predictedHome}–{prediction.predictedAway}</strong></span><span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 12 }}>0 pts 😅</span></>)
           }
         </div>
@@ -240,11 +240,11 @@ function MatchCard({ match, prediction, onPredict }) {
           {error && <div style={{ color: '#ff4a4a', fontSize: 12, marginTop: 10, textAlign: 'center' }}>{error}</div>}
           <button onClick={handleSave} disabled={saving} style={{
             width: '100%', marginTop: 18, padding: 14,
-            background: 'linear-gradient(135deg,#f5c518,#e6a800)',
+            background: 'linear-gradient(135deg, #C9A84C, #a8832a)',
             border: 'none', borderRadius: 12, color: '#0a0f1e',
             fontSize: 15, fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer',
             opacity: saving ? 0.7 : 1, transition: 'all 0.2s',
-            boxShadow: '0 4px 16px rgba(245,197,24,0.3)',
+            boxShadow: '0 4px 20px rgba(201,168,76,0.4)',
           }}>
             {saving ? 'Saving...' : 'Lock In Prediction 🔒'}
           </button>
