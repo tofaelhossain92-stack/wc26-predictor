@@ -130,20 +130,25 @@ function MatchCard({ match, prediction, onPredict }) {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.home_team}</div>
-          <input
-            type="number" min={0} max={20}
-            value={homeG}
-            onChange={e => { setHomeG(e.target.value); setSaved(false) }}
-            disabled={locked || saved || isFuture}
-            placeholder="0"
-            style={{
-              width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
-              background: locked || saved || isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.08)',
-              border: '2px solid rgba(255,255,255,0.12)',
-              borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
-              cursor: isFuture ? 'not-allowed' : 'auto',
-            }}
-          />
+          {(saved || locked) && homeG !== '' ? (
+            <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#f5c518', background: 'rgba(255,255,255,0.04)', borderRadius: 16, border: '2px solid rgba(255,255,255,0.08)' }}>
+              {homeG}
+            </div>
+          ) : (
+            <input
+              type="number" min={0} max={20}
+              value={homeG}
+              onChange={e => { setHomeG(e.target.value); setSaved(false) }}
+              disabled={locked || saved}
+              placeholder="0"
+              style={{
+                width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
+                background: 'rgba(255,255,255,0.08)',
+                border: '2px solid rgba(255,255,255,0.15)',
+                borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: '#f5c518', outline: 'none',
+              }}
+            />
+          )}
           {match.status === 'done' && match.home_goals != null && (
             <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 6 }}>
               Actual: <strong style={{ color: '#fff' }}>{match.home_goals}</strong>
@@ -176,20 +181,25 @@ function MatchCard({ match, prediction, onPredict }) {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.away_team}</div>
-          <input
-            type="number" min={0} max={20}
-            value={awayG}
-            onChange={e => { setAwayG(e.target.value); setSaved(false) }}
-            disabled={locked || saved || isFuture}
-            placeholder="0"
-            style={{
-              width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
-              background: locked || saved || isFuture ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.08)',
-              border: '2px solid rgba(255,255,255,0.12)',
-              borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: isFuture ? 'rgba(255,255,255,0.2)' : '#f5c518', outline: 'none',
-              cursor: isFuture ? 'not-allowed' : 'auto',
-            }}
-          />
+          {(saved || locked) && awayG !== '' ? (
+            <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#f5c518', background: 'rgba(255,255,255,0.04)', borderRadius: 16, border: '2px solid rgba(255,255,255,0.08)' }}>
+              {awayG}
+            </div>
+          ) : (
+            <input
+              type="number" min={0} max={20}
+              value={awayG}
+              onChange={e => { setAwayG(e.target.value); setSaved(false) }}
+              disabled={locked || saved}
+              placeholder="0"
+              style={{
+                width: 72, height: 72, textAlign: 'center', fontSize: 32, fontWeight: 800,
+                background: 'rgba(255,255,255,0.08)',
+                border: '2px solid rgba(255,255,255,0.15)',
+                borderRadius: 16, boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)', color: '#f5c518', outline: 'none',
+              }}
+            />
+          )}
           {match.status === 'done' && match.away_goals != null && (
             <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 6 }}>
               Actual: <strong style={{ color: '#fff' }}>{match.away_goals}</strong>
