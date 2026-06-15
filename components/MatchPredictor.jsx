@@ -26,17 +26,13 @@ function MatchCard({ match, prediction, onPredict }) {
   ]
 
 
-  // Only allow predictions on game day
+  // Allow predictions anytime before kickoff+15 for group stage
   const kickoff  = new Date(match.kickoff_time)
   const now      = new Date()
   const kickoffPlus15 = new Date(kickoff.getTime() + 15 * 60 * 1000)
   const locked = match.status === 'live' || match.status === 'done' || now >= kickoffPlus15
-  const isGameDay = (
-    now.getFullYear() === kickoff.getFullYear() &&
-    now.getMonth()    === kickoff.getMonth() &&
-    now.getDate()     === kickoff.getDate()
-  )
-  const isFuture  = now < kickoff && !isGameDay
+  const isGroupStage = match.group_name && !match.group_name.includes('R')
+  const isFuture = false // Group stage always open
   const daysUntil = Math.ceil((kickoff - now) / (1000 * 60 * 60 * 24))
 
   const winner = homeG !== '' && awayG !== ''
@@ -87,7 +83,7 @@ function MatchCard({ match, prediction, onPredict }) {
       borderRadius: 16, padding: '20px 24px', marginBottom: 12,
       boxShadow: saved ? '0 0 20px rgba(245,197,24,0.07)' : 'none',
       transition: 'all 0.3s',
-      opacity: isFuture ? 0.6 : 1,
+      opacity: 1,
     }}>
       {/* Match header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -110,9 +106,9 @@ function MatchCard({ match, prediction, onPredict }) {
               🔒 Locked In
             </span>
           )}
-          {isFuture && (
+          {!locked && !saved && daysUntil > 0 && (
             <span style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 600 }}>
-              🗓️ {daysUntil === 1 ? 'Opens tomorrow' : `Opens in ${daysUntil} days`}
+              🗓️ {daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil} days`}
             </span>
           )}
         </div>
@@ -204,14 +200,7 @@ function MatchCard({ match, prediction, onPredict }) {
         </div>
       )}
 
-      {/* Future match message */}
-      {isFuture && (
-        <div style={{ marginTop: 14, textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-            🗓️ Predictions open on <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{dateStr}</strong> · lock 15 min after kickoff
-          </div>
-        </div>
-      )}
+
 
       {/* Save button — only on game day, not locked */}
       {!locked && !saved && !isFuture && (
