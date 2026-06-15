@@ -170,7 +170,7 @@ export default function GameClient() {
 
 
       {/* Content */}
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px 100px 16px' }}>
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px 90px 16px' }}>
         {tab === 'predict'     && <MatchPredictor matches={matches} user={user} leaderboard={leaderboard} onPredicted={fetchLeaderboard} />}
         {tab === 'standings'   && <Standings matches={matches} />}
         {tab === 'leaderboard' && <Leaderboard leaderboard={leaderboard} currentUserId={user.id} />}
@@ -182,8 +182,10 @@ export default function GameClient() {
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
         background: 'rgba(4,10,20,0.96)', backdropFilter: 'blur(20px)',
         borderTop: '1px solid rgba(255,255,255,0.08)',
-        display: 'flex', padding: '8px 0 max(8px, env(safe-area-inset-bottom)) 0',
+        padding: '8px 0 max(8px, env(safe-area-inset-bottom)) 0',
+        display: 'flex', justifyContent: 'center',
       }}>
+        <div style={{ display: 'flex', width: '100%', maxWidth: 680 }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
@@ -201,6 +203,7 @@ export default function GameClient() {
             )}
           </button>
         ))}
+        </div>
       </div>
     </div>
   )
