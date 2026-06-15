@@ -94,11 +94,6 @@ export async function GET() {
       const awayGoals = apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0
       const newStatus = mapStatus(apiMatch.status)
 
-      // Detect goal — compare with previous DB score
-      const prevHome = match.home_goals ?? 0
-      const prevAway = match.away_goals ?? 0
-      const goalScored = (homeGoals > prevHome || awayGoals > prevAway) && newStatus === 'live'
-
       // Calculate match period display
       const kickoffTime = new Date(match.kickoff_time)
       const elapsedMins = Math.floor((now - kickoffTime) / 60000)
@@ -117,6 +112,7 @@ export async function GET() {
       // Track goal times — detect new goals and record the minute
       const prevHome = match.home_goals ?? 0
       const prevAway = match.away_goals ?? 0
+      const goalScored = (homeGoals > prevHome || awayGoals > prevAway) && newStatus === 'live'
       let goalTimes = match.goal_times || []
       if (homeGoals > prevHome) {
         const mins = elapsedMins <= 45 ? elapsedMins : elapsedMins <= 60 ? 45 : elapsedMins - 15
