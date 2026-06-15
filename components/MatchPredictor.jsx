@@ -87,7 +87,7 @@ function MatchCard({ match, prediction, onPredict }) {
 
   return (
     <div 
-      className={`match-card ${shake ? 'shake' : ''} ${match.status === 'live' ? 'match-card-live' : ''} ${match.status === 'done' ? 'match-card-done' : ''}`}
+      className={`match-card ${shake ? 'shake' : ''} ${match.status === 'live' ? 'match-card-live' : match.status === 'done' ? 'match-card-done' : saved ? 'match-card-saved' : 'match-card-upcoming'}`}
       style={{
         background: 'linear-gradient(135deg, rgba(15,25,45,0.98), rgba(10,18,35,1))',
         border: `1px solid ${cardBorder}`,
