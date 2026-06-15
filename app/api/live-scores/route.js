@@ -109,20 +109,31 @@ export async function GET() {
         matchPeriod = 'FT'
       }
 
-      // Track goal times — detect new goals and record the minute
+      // Track goal times — only add when total count increases vs DB
       const prevHome = match.home_goals ?? 0
       const prevAway = match.away_goals ?? 0
       const goalScored = (homeGoals > prevHome || awayGoals > prevAway) && newStatus === 'live'
-      let goalTimes = match.goal_times || []
-      if (homeGoals > prevHome) {
-        const mins = elapsedMins <= 45 ? elapsedMins : elapsedMins <= 60 ? 45 : elapsedMins - 15
-        for (let i = 0; i < homeGoals - prevHome; i++) {
+      
+      // Parse existing goal times safely
+      let goalTimes = []
+      if (match.goal_times) {
+        try {
+          goalTimes = Array.isArray(match.goal_times) ? match.goal_times : JSON.parse(match.goal_times)
+        } catch { goalTimes = [] }
+      }
+      
+      // Only add new goals (compare actual count vs recorded count)
+      const homeGoalCount = goalTimes.filter(g => g.team === 'home').length
+      const awayGoalCount = goalTimes.filter(g => g.team === 'away').length
+      const mins = elapsedMins <= 45 ? elapsedMins : elapsedMins <= 60 ? 45 : elapsedMins - 15
+      
+      if (homeGoals > homeGoalCount) {
+        for (let i = 0; i < homeGoals - homeGoalCount; i++) {
           goalTimes = [...goalTimes, { team: 'home', min: mins }]
         }
       }
-      if (awayGoals > prevAway) {
-        const mins = elapsedMins <= 45 ? elapsedMins : elapsedMins <= 60 ? 45 : elapsedMins - 15
-        for (let i = 0; i < awayGoals - prevAway; i++) {
+      if (awayGoals > awayGoalCount) {
+        for (let i = 0; i < awayGoals - awayGoalCount; i++) {
           goalTimes = [...goalTimes, { team: 'away', min: mins }]
         }
       }
