@@ -1,3 +1,6 @@
+'use client'
+import { useState } from 'react'
+
 function safeParseJSON(val) {
   if (!val) return null
   if (typeof val === 'object') return val
@@ -48,9 +51,6 @@ function LiveMatchInfo({ match }) {
     </>
   )
 }
-
-'use client'
-import { useState } from 'react'
 
 function MatchCard({ match, prediction, onPredict }) {
   const [homeG, setHomeG] = useState(prediction?.predictedHome ?? '')
