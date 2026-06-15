@@ -86,14 +86,21 @@ function MatchCard({ match, prediction, onPredict }) {
     : '0 4px 24px rgba(0,0,0,0.3)'
 
   return (
-    <div className={shake ? 'shake' : ''} style={{
-      background: 'linear-gradient(135deg, rgba(15,25,45,0.98), rgba(10,18,35,1))',
-      border: `1px solid ${cardBorder}`,
-      borderRadius: 20, padding: '20px 24px', marginBottom: 14,
-      boxShadow: cardGlow,
-      transition: 'all 0.3s',
-      position: 'relative', overflow: 'hidden',
-    }}>
+    <div 
+      className={`match-card ${shake ? 'shake' : ''} ${match.status === 'live' ? 'match-card-live' : ''} ${match.status === 'done' ? 'match-card-done' : ''}`}
+      style={{
+        background: 'linear-gradient(135deg, rgba(15,25,45,0.98), rgba(10,18,35,1))',
+        border: `1px solid ${cardBorder}`,
+        borderRadius: 20, padding: '20px 24px', marginBottom: 14,
+        position: 'relative', overflow: 'hidden',
+      }}>
+      {/* Glow overlay */}
+      {match.status === 'live' && (
+        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(255,74,74,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      )}
+      {match.status === 'done' && (
+        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 300, background: 'radial-gradient(circle, rgba(245,197,24,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      )}
       {/* Match header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -165,7 +172,7 @@ function MatchCard({ match, prediction, onPredict }) {
             </div>
           )}
           {(match.status === 'done' || match.status === 'live') && match.home_goals != null && (
-            <div style={{ color: match.status === 'live' ? '#ff4a4a' : '#f5c518', fontSize: 42, fontWeight: 900, margin: '4px 0', letterSpacing: '-1px', textShadow: match.status === 'live' ? '0 0 20px rgba(255,74,74,0.3)' : '0 0 20px rgba(245,197,24,0.3)' }}>
+            <div className={match.status === 'live' ? 'score-live' : ''} style={{ color: match.status === 'live' ? '#ff4a4a' : '#f5c518', fontSize: 42, fontWeight: 900, margin: '4px 0', letterSpacing: '-1px', textShadow: match.status === 'live' ? '0 0 20px rgba(255,74,74,0.3)' : '0 0 20px rgba(245,197,24,0.3)' }}>
               {match.home_goals}–{match.away_goals}
             </div>
           )}
