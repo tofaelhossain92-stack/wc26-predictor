@@ -62,10 +62,11 @@ function getGoalTeam(match, prevHome, prevAway, newHome, newAway) {
 
 export async function GET() {
   try {
-    const now = new Date().toISOString()
+    const now = new Date()
+    const nowISO = now.toISOString()
 
     // Get all matches that are live or upcoming past kickoff
-    const matches = await sbGet(`matches?select=*&or=(status.eq.live,and(status.eq.upcoming,kickoff_time.lte.${now}))&order=kickoff_time.asc`)
+    const matches = await sbGet(`matches?select=*&or=(status.eq.live,and(status.eq.upcoming,kickoff_time.lte.${nowISO}))&order=kickoff_time.asc`)
 
     if (!matches?.length) {
       return NextResponse.json({ ok: true, updated: 0 })
@@ -98,11 +99,27 @@ export async function GET() {
       const prevAway = match.away_goals ?? 0
       const goalScored = (homeGoals > prevHome || awayGoals > prevAway) && newStatus === 'live'
 
+      // Calculate match period display
+      const kickoffTime = new Date(match.kickoff_time)
+      const elapsedMins = Math.floor((now - kickoffTime) / 60000)
+      let matchPeriod = null
+      if (apiMatch.status === 'PAUSED') {
+        matchPeriod = 'HT'
+      } else if (apiMatch.status === 'IN_PLAY') {
+        if (elapsedMins <= 45) matchPeriod = `${elapsedMins}'`
+        else if (elapsedMins <= 60) matchPeriod = `45+'`
+        else if (elapsedMins <= 90) matchPeriod = `${elapsedMins - 15}'`
+        else matchPeriod = `90+'`
+      } else if (apiMatch.status === 'FINISHED') {
+        matchPeriod = 'FT'
+      }
+
       // Update match in DB
       await sbPatch(`matches?id=eq.${match.id}`, {
         home_goals: homeGoals,
         away_goals: awayGoals,
-        status: newStatus
+        status: newStatus,
+        match_period: matchPeriod
       })
 
       // Send goal notification
