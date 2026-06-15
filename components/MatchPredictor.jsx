@@ -252,18 +252,18 @@ function MatchCard({ match, prediction, onPredict }) {
                     <div style={{ color: '#C8102E', fontSize: 20, fontWeight: 900 }}>{prob.home}%</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>Draw</div>
-                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, fontWeight: 800 }}>{prob.draw}%</div>
+                    <div style={{ color: '#A8A9AD', fontSize: 11, fontWeight: 700 }}>Draw</div>
+                    <div style={{ color: '#A8A9AD', fontSize: 18, fontWeight: 800 }}>{prob.draw}%</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 800 }}>{match.away_team}</div>
-                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 20, fontWeight: 900 }}>{prob.away}%</div>
+                    <div style={{ color: '#4a9eff', fontSize: 12, fontWeight: 800 }}>{match.away_team}</div>
+                    <div style={{ color: '#4a9eff', fontSize: 20, fontWeight: 900 }}>{prob.away}%</div>
                   </div>
                 </div>
                 <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', gap: 2 }}>
-                  <div style={{ width: `${prob.home}%`, background: 'linear-gradient(90deg,#C8102E,#ff3355)', borderRadius: '4px 0 0 4px' }} />
-                  <div style={{ width: `${prob.draw}%`, background: 'rgba(255,255,255,0.15)' }} />
-                  <div style={{ width: `${prob.away}%`, background: 'rgba(255,255,255,0.25)', borderRadius: '0 4px 4px 0' }} />
+                  <div style={{ width: `${prob.home}%`, background: 'linear-gradient(90deg,#C8102E,#e8374a)', borderRadius: '4px 0 0 4px' }} />
+                  <div style={{ width: `${prob.draw}%`, background: 'rgba(168,169,173,0.3)' }} />
+                  <div style={{ width: `${prob.away}%`, background: 'linear-gradient(90deg,#1a6fd4,#4a9eff)', borderRadius: '0 4px 4px 0' }} />
                 </div>
               </>
             )
