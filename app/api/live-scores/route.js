@@ -131,7 +131,14 @@ export async function GET() {
       // Only add new goals (compare actual count vs recorded count)
       const homeGoalCount = goalTimes.filter(g => g.team === 'home').length
       const awayGoalCount = goalTimes.filter(g => g.team === 'away').length
-      const mins = elapsedMins <= 47 ? Math.min(elapsedMins, 45) : elapsedMins <= 62 ? 45 : Math.min(elapsedMins - 22, 90)
+      // Use the displayed match period as the goal minute (consistent with badge)
+      let mins = 0
+      if (matchPeriod === 'HT') mins = 45
+      else if (matchPeriod === 'FT') mins = 90
+      else if (matchPeriod) {
+        const parsed = parseInt(matchPeriod.replace("'", ''))
+        mins = isNaN(parsed) ? 0 : parsed
+      }
       
       if (homeGoals > homeGoalCount) {
         for (let i = 0; i < homeGoals - homeGoalCount; i++) {
