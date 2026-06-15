@@ -33,8 +33,9 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Predictions are locked — match has started' }, { status: 403 })
     }
 
-    // Double-check kickoff time server-side (safety net)
-    if (new Date(match.kickoff_time) <= new Date()) {
+    // Lock predictions 15 mins after kickoff
+    const kickoffPlus15 = new Date(new Date(match.kickoff_time).getTime() + 15 * 60 * 1000)
+    if (new Date() >= kickoffPlus15) {
       return NextResponse.json({ error: 'Predictions are locked — match has started' }, { status: 403 })
     }
 
