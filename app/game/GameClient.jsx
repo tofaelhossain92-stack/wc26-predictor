@@ -6,9 +6,11 @@ import { supabase } from '@/lib/supabase'
 import MatchPredictor from '@/components/MatchPredictor'
 import Leaderboard   from '@/components/Leaderboard'
 import TrashTalk     from '@/components/TrashTalk'
+import Standings     from '@/components/Standings'
 
 const TABS = [
   { id: 'predict',     label: '⚽ Predict' },
+  { id: 'standings',   label: '📊 Standings' },
   { id: 'leaderboard', label: '🏅 Leaderboard' },
   { id: 'trash',       label: '💬 Trash Talk' },
 ]
@@ -182,6 +184,7 @@ export default function GameClient() {
       {/* Content */}
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px' }}>
         {tab === 'predict'     && <MatchPredictor matches={matches} user={user} leaderboard={leaderboard} onPredicted={fetchLeaderboard} />}
+        {tab === 'standings'   && <Standings matches={matches} />}
         {tab === 'leaderboard' && <Leaderboard leaderboard={leaderboard} currentUserId={user.id} />}
         {tab === 'trash'       && <TrashTalk user={user} />}
       </div>
