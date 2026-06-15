@@ -11,6 +11,7 @@ export default function AdminPage() {
   const [matches, setMatches]   = useState([])
   const [saving, setSaving]     = useState({})
   const [saved, setSaved]       = useState({})
+  const [syncing, setSyncing]   = useState({})
   const [scores, setScores]     = useState({})
 
   function login() {
@@ -77,6 +78,28 @@ export default function AdminPage() {
   const todayMatches  = matches.filter(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) === today)
   const otherMatches  = matches.filter(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) !== today)
 
+  async function syncMatch(match) {
+    if (!match.api_match_id) {
+      alert('No API match ID set for this match — cannot auto-sync.')
+      return
+    }
+    setSyncing(s => ({ ...s, [match.id]: true }))
+    const res = await fetch('/api/admin/sync-match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matchId: match.id })
+    })
+    const data = await res.json()
+    setSyncing(s => ({ ...s, [match.id]: false }))
+    if (data.ok) {
+      // Update local scores state with fetched data
+      setScores(s => ({ ...s, [match.id]: { home: data.home_goals, away: data.away_goals, status: data.status } }))
+      alert(`✅ Synced! ${match.home_team} ${data.home_goals} – ${data.away_goals} ${match.away_team} (${data.status})`)
+    } else {
+      alert('Sync failed: ' + (data.error || 'Unknown error'))
+    }
+  }
+
   async function notifyMatch(match) {
     const res = await fetch('/api/admin/notify', {
       method: 'POST',
@@ -123,6 +146,12 @@ export default function AdminPage() {
         >
           {saving[match.id] ? 'Saving...' : saved[match.id] ? '✅ Saved!' : 'Update ✓'}
         </button>
+        <button
+          onClick={() => syncMatch(match)}
+          disabled={syncing[match.id]}
+          style={{ padding: '12px 16px', background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.3)', borderRadius: 10, color: '#4a9eff', fontSize: 18, cursor: 'pointer', opacity: syncing[match.id] ? 0.5 : 1 }}
+          title="Auto-sync score from API"
+        >{syncing[match.id] ? '⏳' : '🔄'}</button>
         <button
           onClick={() => notifyMatch(match)}
           style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, color: '#fff', fontSize: 18, cursor: 'pointer' }}
