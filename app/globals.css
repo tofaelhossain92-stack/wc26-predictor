@@ -186,3 +186,48 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   animation: shimmer 5s ease-in-out infinite;
   pointer-events: none;
 }
+
+/* ── Card Glow Effects for all states ──────────────────────────── */
+
+/* Upcoming/Locked cards — subtle blue-navy breathing glow */
+@keyframes upcomingGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(0,40,104,0.4), 0 4px 24px rgba(0,0,0,0.5); }
+  50%       { box-shadow: 0 0 30px rgba(0,40,104,0.7), 0 4px 24px rgba(0,0,0,0.5); }
+}
+
+/* Saved/Locked prediction cards — gold breathing */
+@keyframes savedGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(201,168,76,0.1), 0 4px 24px rgba(0,0,0,0.5); }
+  50%       { box-shadow: 0 0 30px rgba(201,168,76,0.25), 0 4px 24px rgba(0,0,0,0.5); }
+}
+
+.match-card-upcoming {
+  animation: upcomingGlow 3s ease-in-out infinite;
+}
+
+.match-card-saved {
+  animation: savedGlow 2.5s ease-in-out infinite;
+}
+
+/* Hover effect — all cards lift and brighten */
+.match-card:hover {
+  transform: translateY(-3px) scale(1.01);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Input focus glow */
+.match-card input[type="number"]:focus {
+  border-color: rgba(201,168,76,0.6) !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15), inset 0 2px 8px rgba(0,0,0,0.2) !important;
+  outline: none;
+}
+
+/* Hide number input spinners */
+.match-card input[type="number"]::-webkit-inner-spin-button,
+.match-card input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.match-card input[type="number"] {
+  -moz-appearance: textfield;
+}
