@@ -363,11 +363,17 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
   const dates    = ['All', ...new Set(
     matches.map(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }))
   )]
-  const filtered = filterDate === 'All'
+  const statusOrder = { live: 0, upcoming: 1, done: 2 }
+  const filtered = (filterDate === 'All'
     ? matches
     : matches.filter(m =>
         new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) === filterDate
       )
+  ).slice().sort((a, b) => {
+    const so = (statusOrder[a.status] ?? 1) - (statusOrder[b.status] ?? 1)
+    if (so !== 0) return so
+    return new Date(a.kickoff_time) - new Date(b.kickoff_time)
+  })
 
   const predCount  = Object.keys(myPredMap).length
   const totalCount = matches.filter(m => m.status === 'upcoming').length
