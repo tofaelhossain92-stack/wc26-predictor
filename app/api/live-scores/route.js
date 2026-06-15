@@ -114,12 +114,53 @@ export async function GET() {
         matchPeriod = 'FT'
       }
 
+      // Track goal times — detect new goals and record the minute
+      const prevHome = match.home_goals ?? 0
+      const prevAway = match.away_goals ?? 0
+      let goalTimes = match.goal_times || []
+      if (homeGoals > prevHome) {
+        const mins = elapsedMins <= 45 ? elapsedMins : elapsedMins <= 60 ? 45 : elapsedMins - 15
+        for (let i = 0; i < homeGoals - prevHome; i++) {
+          goalTimes = [...goalTimes, { team: 'home', min: mins }]
+        }
+      }
+      if (awayGoals > prevAway) {
+        const mins = elapsedMins <= 45 ? elapsedMins : elapsedMins <= 60 ? 45 : elapsedMins - 15
+        for (let i = 0; i < awayGoals - prevAway; i++) {
+          goalTimes = [...goalTimes, { team: 'away', min: mins }]
+        }
+      }
+
+      // Calculate win probability based on score + time
+      const totalMins = Math.min(elapsedMins, 90)
+      const timeLeft = Math.max(0, 90 - totalMins)
+      const scoreDiff = homeGoals - awayGoals
+      // Base prob shifts with score diff and time remaining
+      let homeWin, draw, awayWin
+      if (newStatus === 'done') {
+        homeWin = homeGoals > awayGoals ? 100 : 0
+        draw = homeGoals === awayGoals ? 100 : 0
+        awayWin = awayGoals > homeGoals ? 100 : 0
+      } else {
+        const baseHome = 45, baseDraw = 25, baseAway = 30
+        const scoreShift = scoreDiff * (15 + (90 - timeLeft) * 0.3)
+        homeWin = Math.max(5, Math.min(90, baseHome + scoreShift))
+        awayWin = Math.max(5, Math.min(90, baseAway - scoreShift))
+        draw = Math.max(5, Math.min(50, 100 - homeWin - awayWin))
+        const total = homeWin + draw + awayWin
+        homeWin = Math.round(homeWin / total * 100)
+        draw = Math.round(draw / total * 100)
+        awayWin = 100 - homeWin - draw
+      }
+
       // Update match in DB
       await sbPatch(`matches?id=eq.${match.id}`, {
         home_goals: homeGoals,
         away_goals: awayGoals,
         status: newStatus,
-        match_period: matchPeriod
+        match_period: matchPeriod,
+        goal_times: JSON.stringify(goalTimes),
+        win_prob: JSON.stringify({ home: homeWin, draw, away: awayWin })
       })
 
       // Send goal notification
