@@ -226,6 +226,51 @@ function MatchCard({ match, prediction, onPredict }) {
         </div>
       </div>
 
+      {/* Goal times */}
+      {match.status === 'live' && match.goal_times && JSON.parse(match.goal_times || '[]').length > 0 && (
+        <div style={{ marginTop: 14, padding: '0 4px' }}>
+          {JSON.parse(match.goal_times).map((g, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0', flexDirection: g.team === 'away' ? 'row-reverse' : 'row' }}>
+              <span style={{ fontSize: 13 }}>⚽</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 8px' }}>{g.min}'</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Win probability */}
+      {match.status === 'live' && match.win_prob && (
+        <div style={{ marginTop: 14, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: 10, fontWeight: 700, letterSpacing: 2, textAlign: 'center', marginBottom: 10 }}>LIVE WIN PROBABILITY</div>
+          {(() => {
+            const prob = JSON.parse(match.win_prob)
+            return (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
+                  <div>
+                    <div style={{ color: '#C8102E', fontSize: 12, fontWeight: 800 }}>{match.home_team}</div>
+                    <div style={{ color: '#C8102E', fontSize: 20, fontWeight: 900 }}>{prob.home}%</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>Draw</div>
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, fontWeight: 800 }}>{prob.draw}%</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 800 }}>{match.away_team}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 20, fontWeight: 900 }}>{prob.away}%</div>
+                  </div>
+                </div>
+                <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', gap: 2 }}>
+                  <div style={{ width: `${prob.home}%`, background: 'linear-gradient(90deg,#C8102E,#ff3355)', borderRadius: '4px 0 0 4px' }} />
+                  <div style={{ width: `${prob.draw}%`, background: 'rgba(255,255,255,0.15)' }} />
+                  <div style={{ width: `${prob.away}%`, background: 'rgba(255,255,255,0.25)', borderRadius: '0 4px 4px 0' }} />
+                </div>
+              </>
+            )
+          })()}
+        </div>
+      )}
+
       {/* Divider */}
       {(match.status === 'done' || match.status === 'live') && (
         <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '16px 0' }}></div>
