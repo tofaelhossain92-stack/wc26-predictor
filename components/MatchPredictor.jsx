@@ -83,7 +83,7 @@ function MatchCard({ match, prediction, onPredict }) {
 
 
   // Allow predictions anytime before kickoff+15 for group stage
-  const kickoff  = new Date(match.kickoff_time)
+  const kickoff  = match.kickoff_time ? new Date(match.kickoff_time) : new Date(Date.now() + 86400000)
   const now      = new Date()
   const kickoffPlus15 = new Date(kickoff.getTime() + 15 * 60 * 1000)
   const locked = match.status === 'live' || match.status === 'done' || now >= kickoffPlus15
@@ -367,12 +367,12 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
   }
 
   const dates    = ['All', ...new Set(
-    matches.map(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }))
+    matches.filter(m => m.kickoff_time && m.kickoff_time).map(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }))
   )]
   const statusOrder = { live: 0, upcoming: 1, done: 2 }
   const filtered = (filterDate === 'All'
     ? matches
-    : matches.filter(m =>
+    : matches.filter(m => m.kickoff_time &&
         new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }) === filterDate
       )
   ).slice().sort((a, b) => {
@@ -382,11 +382,11 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
   })
 
   const predCount  = Object.keys(myPredMap).length
-  const totalCount = matches.filter(m => m.status === 'upcoming').length
+  const totalCount = matches.filter(m => m.kickoff_time && m.status === 'upcoming').length
 
   // Count today's matches available for prediction
   const now = new Date()
-  const todayMatches = matches.filter(m => {
+  const todayMatches = matches.filter(m => m.kickoff_time && {
     const k = new Date(m.kickoff_time)
     return k.getFullYear() === now.getFullYear() &&
            k.getMonth()    === now.getMonth() &&
