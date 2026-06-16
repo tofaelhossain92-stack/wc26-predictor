@@ -89,7 +89,10 @@ function MatchCard({ match, prediction, onPredict }) {
   const locked = match.status === 'live' || match.status === 'done' || now >= kickoffPlus15
   const isGroupStage = match.group_name && !match.group_name.includes('R')
   const isFuture = false // Group stage always open
-  const daysUntil = Math.ceil((kickoff - now) / (1000 * 60 * 60 * 24))
+  // Compare calendar dates (local) so same-day matches don't show "Tomorrow"
+  const kickoffDate = new Date(kickoff.getFullYear(), kickoff.getMonth(), kickoff.getDate())
+  const todayDate   = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const daysUntil   = Math.round((kickoffDate - todayDate) / (1000 * 60 * 60 * 24))
 
   const winner = homeG !== '' && awayG !== ''
     ? +homeG > +awayG ? match.home_team : +homeG < +awayG ? match.away_team : 'Draw'
