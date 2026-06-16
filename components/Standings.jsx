@@ -59,7 +59,7 @@ export default function Standings({ matches }) {
     return teamMap[key]
   }
 
-  matches.filter(m => m.status === 'done' && m.home_goals != null && m.group_name && !m.group_name.includes('R')).forEach(m => {
+  matches.filter(m => m.status === 'done' && m.home_goals != null && m.group_name && ['A','B','C','D','E','F','G','H','I','J','K','L'].includes(m.group_name)).forEach(m => {
     const home = addTeam(m.home_team, m.home_flag, m.group_name)
     const away = addTeam(m.away_team, m.away_flag, m.group_name)
 
@@ -79,18 +79,31 @@ export default function Standings({ matches }) {
     away.gd = away.gf - away.ga
   })
 
-  // Also add teams that haven't played yet
-  matches.filter(m => m.group_name && !m.group_name.includes('R')).forEach(m => {
+  // Valid group letters only — A through L
+  const VALID_GROUPS = new Set(['A','B','C','D','E','F','G','H','I','J','K','L'])
+
+  // Also add teams that haven't played yet (only valid single-letter groups, no TBD teams)
+  matches.filter(m => m.group_name && VALID_GROUPS.has(m.group_name)).forEach(m => {
+    if (!m.home_team || m.home_team.startsWith('TBD') || m.home_team.startsWith('Winner') || m.home_team.startsWith('Loser')) return
+    if (!m.away_team || m.away_team.startsWith('TBD') || m.away_team.startsWith('Winner') || m.away_team.startsWith('Loser')) return
     addTeam(m.home_team, m.home_flag, m.group_name)
     addTeam(m.away_team, m.away_flag, m.group_name)
   })
 
-  // Group by group letter
+  // Group by group letter — only valid A-L, cap at 4 teams
   const groups = {}
   Object.values(teamMap).forEach(team => {
+    if (!VALID_GROUPS.has(team.group)) return
     if (!groups[team.group]) groups[team.group] = []
     if (!groups[team.group].find(t => t.name === team.name)) {
       groups[team.group].push(team)
+    }
+  })
+
+  // Cap at 4 teams per group (keeps highest-pts teams if DB has duplicates)
+  Object.keys(groups).forEach(g => {
+    if (groups[g].length > 4) {
+      groups[g] = groups[g].sort((a, b) => b.pts - a.pts || b.gd - a.gd).slice(0, 4)
     }
   })
 
