@@ -24,9 +24,10 @@ WHERE p.match_id = m.id
   AND m.home_goals IS NOT NULL
   AND m.away_goals IS NOT NULL;
 
--- Step 2: Null out points for predictions on unfinished matches
+-- Step 2: Reset points to 0 for predictions on unfinished matches
+-- (points_earned has NOT NULL constraint so we use 0 instead of NULL)
 UPDATE predictions p
-SET points_earned = NULL
+SET points_earned = 0
 FROM matches m
 WHERE p.match_id = m.id
   AND m.status != 'done';
