@@ -90,8 +90,14 @@ export async function GET() {
       })
       const apiMatch = await apiRes.json()
 
-      const homeGoals = apiMatch.score?.fullTime?.home ?? apiMatch.score?.halfTime?.home ?? 0
-      const awayGoals = apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0
+      // Only use fullTime when match is finished — never use halfTime for final score
+      const isFinished = apiMatch.status === 'FINISHED'
+      const homeGoals = isFinished
+        ? (apiMatch.score?.fullTime?.home ?? 0)
+        : (apiMatch.score?.fullTime?.home ?? apiMatch.score?.halfTime?.home ?? 0)
+      const awayGoals = isFinished
+        ? (apiMatch.score?.fullTime?.away ?? 0)
+        : (apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0)
       const newStatus = mapStatus(apiMatch.status)
 
       // Calculate match period display
@@ -195,9 +201,13 @@ export async function GET() {
         }
       }
 
-      // If just finished, settle predictions and notify
-      if (newStatus === 'done' && match.status !== 'done') {
-        await settleMatch(match.id, homeGoals, awayGoals, match)
+      // Settle predictions when match finishes OR if done but points weren't calculated
+      if (newStatus === 'done') {
+        const needsSettle = match.status !== 'done'
+        const preds = needsSettle ? null : await sbGet(`predictions?match_id=eq.${match.id}&points_earned=is.null&select=id`)
+        if (needsSettle || (preds && preds.length > 0)) {
+          await settleMatch(match.id, homeGoals, awayGoals, match)
+        }
       }
 
       updated++
