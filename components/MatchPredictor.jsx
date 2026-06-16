@@ -386,7 +386,8 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
 
   // Count today's matches available for prediction
   const now = new Date()
-  const todayMatches = matches.filter(m => m.kickoff_time && {
+  const todayMatches = matches.filter(m => {
+    if (!m.kickoff_time) return false
     const k = new Date(m.kickoff_time)
     return k.getFullYear() === now.getFullYear() &&
            k.getMonth()    === now.getMonth() &&
