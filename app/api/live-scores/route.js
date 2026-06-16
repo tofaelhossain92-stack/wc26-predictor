@@ -36,14 +36,31 @@ async function sbPatch(path, body) {
 }
 
 async function settleMatch(matchId, homeGoals, awayGoals, match) {
+  // Guard: don't settle with a null/invalid score
+  if (homeGoals === null || homeGoals === undefined || awayGoals === null || awayGoals === undefined) {
+    console.warn(`[settle] Skipping match ${matchId} — invalid score: ${homeGoals}-${awayGoals}`)
+    return
+  }
+
+  // Fetch all predictions for this match
   const predictions = await sbGet(`predictions?match_id=eq.${matchId}&select=id,user_id,home_goals,away_goals`)
+  if (!predictions?.length) return
+
+  // Calculate and update each prediction's points
   for (const pred of predictions) {
     const pts = calcPoints(pred, { home_goals: homeGoals, away_goals: awayGoals })
     await sbPatch(`predictions?id=eq.${pred.id}`, { points_earned: pts })
-    const allPreds = await sbGet(`predictions?user_id=eq.${pred.user_id}&select=points_earned`)
-    const total = allPreds.reduce((sum, p) => sum + (p.points_earned || 0), 0)
-    await sbPatch(`users?id=eq.${pred.user_id}`, { points: total })
   }
+
+  // Recalculate total points per user (do this after ALL predictions updated)
+  const userIds = [...new Set(predictions.map(p => p.user_id))]
+  for (const userId of userIds) {
+    const allPreds = await sbGet(`predictions?user_id=eq.${userId}&select=points_earned`)
+    const total = allPreds.reduce((sum, p) => sum + (p.points_earned || 0), 0)
+    await sbPatch(`users?id=eq.${userId}`, { points: total })
+  }
+
+  // Notify result
   await notifyResultIn(
     match.home_team, match.away_team,
     homeGoals, awayGoals,
@@ -201,12 +218,21 @@ export async function GET() {
         }
       }
 
-      // Settle predictions when match finishes OR if done but points weren't calculated
-      if (newStatus === 'done') {
-        const needsSettle = match.status !== 'done'
-        const preds = needsSettle ? null : await sbGet(`predictions?match_id=eq.${match.id}&points_earned=is.null&select=id`)
-        if (needsSettle || (preds && preds.length > 0)) {
+      // Settle predictions when match finishes OR re-settle if any prediction still has 0 points
+      // (0 is used as "unsettled" since points_earned has NOT NULL constraint)
+      if (newStatus === 'done' && homeGoals !== null && awayGoals !== null) {
+        const justFinished = match.status !== 'done'
+        if (justFinished) {
+          // Fresh finish — settle immediately
           await settleMatch(match.id, homeGoals, awayGoals, match)
+        } else {
+          // Already done — check if any predictions have 0 points when they shouldn't
+          // (i.e. unsettled predictions where at least one prediction exists)
+          const allPreds = await sbGet(`predictions?match_id=eq.${match.id}&select=id,points_earned`)
+          const hasUnsettled = allPreds?.some(p => p.points_earned === 0 || p.points_earned === null)
+          if (hasUnsettled) {
+            await settleMatch(match.id, homeGoals, awayGoals, match)
+          }
         }
       }
 
