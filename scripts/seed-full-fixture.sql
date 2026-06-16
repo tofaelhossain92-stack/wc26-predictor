@@ -53,7 +53,7 @@ SELECT insert_match_if_missing('Tunisia',      'Japan',           '🇹🇳','�
 SELECT insert_match_if_missing('Spain',        'Saudi Arabia',    '🇪🇸','🇸🇦', '2026-06-21T16:00:00Z', 'H');
 SELECT insert_match_if_missing('Belgium',      'IR Iran',         '🇧🇪','🇮🇷', '2026-06-21T19:00:00Z', 'G');
 SELECT insert_match_if_missing('Uruguay',      'Cabo Verde',      '🇺🇾','🇨🇻', '2026-06-21T22:00:00Z', 'H');
-SELECT insert_match_if_missing('New Zealand',  'Egypt',           '🇳🇿','🇪🇬', '2026-06-22T01:00:00Z', 'I');
+SELECT insert_match_if_missing('New Zealand',  'Egypt',           '🇳🇿','🇪🇬', '2026-06-22T01:00:00Z', 'G');
 
 -- ── JUN 22 ────────────────────────────────────────────────────────────────
 SELECT insert_match_if_missing('Argentina',    'Austria',         '🇦🇷','🇦🇹', '2026-06-22T17:00:00Z', 'J');
@@ -88,8 +88,10 @@ SELECT insert_match_if_missing('Senegal',      'Iraq',            '🇸🇳','�
 
 -- ── JUN 27 ────────────────────────────────────────────────────────────────
 SELECT insert_match_if_missing('Japan',        'Belgium',         '🇯🇵','🇧🇪', '2026-06-27T16:00:00Z', 'G');
-SELECT insert_match_if_missing('Saudi Arabia', 'New Zealand',     '🇸🇦','🇳🇿', '2026-06-27T19:00:00Z', 'H');
-SELECT insert_match_if_missing('IR Iran',      'Cabo Verde',      '🇮🇷','🇨🇻', '2026-06-27T22:00:00Z', 'G');
+-- Saudi Arabia vs New Zealand was wrong — these teams are in different groups
+SELECT insert_match_if_missing('IR Iran',      'New Zealand',     '🇮🇷','🇳🇿', '2026-06-27T22:00:00Z', 'G'); -- IR Iran vs New Zealand
+SELECT insert_match_if_missing('Belgium',      'New Zealand',     '🇧🇪','🇳🇿', '2026-06-27T16:00:00Z', 'G'); -- This was Japan vs Belgium before, fix below
+-- IR Iran vs Cabo Verde removed — these teams are in different groups (G and H)
 SELECT insert_match_if_missing('Uruguay',      'Spain',           '🇺🇾','🇪🇸', '2026-06-28T01:00:00Z', 'H');
 SELECT insert_match_if_missing('Algeria',      'Austria',         '🇩🇿','🇦🇹', '2026-06-27T22:00:00Z', 'J');
 SELECT insert_match_if_missing('Congo DR',     'Uzbekistan',      '🇨🇩','🇺🇿', '2026-06-28T01:00:00Z', 'K');

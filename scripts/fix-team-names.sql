@@ -89,6 +89,18 @@ UPDATE matches SET group_name = 'K' WHERE home_team IN ('Portugal','Congo DR','U
 -- Group L
 UPDATE matches SET group_name = 'L' WHERE home_team IN ('England','Croatia','Ghana','Panama') OR away_team IN ('England','Croatia','Ghana','Panama');
 
+
+-- Fix New Zealand — belongs in Group G (Belgium, Egypt, IR Iran, New Zealand)
+-- It was incorrectly inserted into Group I and H by the seed script
+UPDATE matches SET group_name = 'G' WHERE home_team = 'New Zealand' OR away_team = 'New Zealand';
+
+-- Fix any match that incorrectly pairs teams from different groups
+-- Saudi Arabia vs New Zealand doesn't exist — delete if inserted
+DELETE FROM matches WHERE (home_team = 'Saudi Arabia' AND away_team = 'New Zealand') OR (home_team = 'New Zealand' AND away_team = 'Saudi Arabia');
+
+-- IR Iran vs Cabo Verde doesn't exist — delete if inserted  
+DELETE FROM matches WHERE (home_team = 'IR Iran' AND away_team = 'Cabo Verde') OR (home_team = 'Cabo Verde' AND away_team = 'IR Iran');
+
 -- ── 3. Verify — show team count per group ────────────────────────────────
 SELECT 
   group_name,
