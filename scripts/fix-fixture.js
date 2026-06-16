@@ -9,56 +9,66 @@ const SUPABASE_KEY       = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 // ── Flag map ────────────────────────────────────────────────────────────────
 const FLAG_MAP = {
   'Mexico': '🇲🇽', 'South Africa': '🇿🇦', 'Korea Republic': '🇰🇷',
-  'Czechia': '🇨🇿', 'Czech Republic': '🇨🇿', 'Canada': '🇨🇦',
+  'South Korea': '🇰🇷', 'Republic of Korea': '🇰🇷',
+  'Czechia': '🇨🇿', 'Czech Republic': '🇨🇿',
+  'Canada': '🇨🇦',
   'Bosnia and Herzegovina': '🇧🇦', 'Bosnia & Herz.': '🇧🇦',
+  'Bosnia-Herzegovina': '🇧🇦', 'Bosnia & Herzegovina': '🇧🇦',
   'Qatar': '🇶🇦', 'Switzerland': '🇨🇭', 'Brazil': '🇧🇷',
   'Morocco': '🇲🇦', 'Haiti': '🇭🇹', 'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
   'Australia': '🇦🇺', 'Türkiye': '🇹🇷', 'Turkey': '🇹🇷',
   'Germany': '🇩🇪', 'Curaçao': '🇨🇼', 'Curacao': '🇨🇼',
   'Netherlands': '🇳🇱', 'Japan': '🇯🇵', 'Sweden': '🇸🇪',
-  'Tunisia': '🇹🇳', 'Spain': '🇪🇸', 'Cabo Verde': '🇨🇻',
-  'Cape Verde': '🇨🇻', 'Belgium': '🇧🇪', 'Egypt': '🇪🇬',
+  'Tunisia': '🇹🇳', 'Spain': '🇪🇸',
+  'Cabo Verde': '🇨🇻', 'Cape Verde': '🇨🇻', 'Cape Verde Islands': '🇨🇻',
+  'Belgium': '🇧🇪', 'Egypt': '🇪🇬',
   'Saudi Arabia': '🇸🇦', 'Uruguay': '🇺🇾', 'France': '🇫🇷',
   'Senegal': '🇸🇳', 'Argentina': '🇦🇷', 'Algeria': '🇩🇿',
   'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Croatia': '🇭🇷', 'Portugal': '🇵🇹',
-  'Congo DR': '🇨🇩', 'DR Congo': '🇨🇩', 'United States': '🇺🇸',
-  'USA': '🇺🇸', 'Paraguay': '🇵🇾', 'Ecuador': '🇪🇨',
-  'Colombia': '🇨🇴', 'Venezuela': '🇻🇪', 'Chile': '🇨🇱',
-  'Peru': '🇵🇪', 'Bolivia': '🇧🇴', 'Panama': '🇵🇦',
-  'Costa Rica': '🇨🇷', 'Guatemala': '🇬🇹', 'Honduras': '🇭🇳',
-  'Jamaica': '🇯🇲', 'Trinidad and Tobago': '🇹🇹', 'Cuba': '🇨🇺',
+  'Congo DR': '🇨🇩', 'DR Congo': '🇨🇩',
+  'Democratic Republic of Congo': '🇨🇩',
+  'Democratic Republic of the Congo': '🇨🇩',
+  'United States': '🇺🇸', 'USA': '🇺🇸',
+  'Paraguay': '🇵🇾', 'Ecuador': '🇪🇨',
+  'Colombia': '🇨🇴', 'Panama': '🇵🇦',
   'Iran': '🇮🇷', 'IR Iran': '🇮🇷', 'Iraq': '🇮🇶',
   'Jordan': '🇯🇴', 'New Zealand': '🇳🇿', 'Norway': '🇳🇴',
-  'Austria': '🇦🇹', 'Ukraine': '🇺🇦', 'Slovakia': '🇸🇰',
-  'Serbia': '🇷🇸', 'Denmark': '🇩🇰', 'Slovenia': '🇸🇮',
-  'Albania': '🇦🇱', 'Poland': '🇵🇱', 'Hungary': '🇭🇺',
-  'Georgia': '🇬🇪', 'Turkey': '🇹🇷', 'Romania': '🇷🇴',
-  'Italy': '🇮🇹', 'Wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿', 'Northern Ireland': '🇬🇧',
-  'Cameroon': '🇨🇲', 'Nigeria': '🇳🇬', 'Ghana': '🇬🇭',
-  'Ivory Coast': '🇨🇮', "Côte d'Ivoire": '🇨🇮', 'Mali': '🇲🇱',
-  'Burkina Faso': '🇧🇫', 'Angola': '🇦🇴', 'Tanzania': '🇹🇿',
-  'Zimbabwe': '🇿🇼', 'Kenya': '🇰🇪', 'Uganda': '🇺🇬',
-  'China PR': '🇨🇳', 'China': '🇨🇳', 'Thailand': '🇹🇭',
-  'Indonesia': '🇮🇩', 'Vietnam': '🇻🇳', 'India': '🇮🇳',
-  'Uzbekistan': '🇺🇿', 'Bahrain': '🇧🇭', 'Oman': '🇴🇲',
-  'United Arab Emirates': '🇦🇪', 'Kuwait': '🇰🇼',
-  'United States': '🇺🇸',
+  'Austria': '🇦🇹', 'Ghana': '🇬🇭',
+  "Côte d'Ivoire": '🇨🇮', "Cote d'Ivoire": '🇨🇮', 'Ivory Coast': '🇨🇮',
+  'Uzbekistan': '🇺🇿',
 }
 
 // ── Team name normalizer — maps API names → our DB names ────────────────────
 const TEAM_NORMALIZE = {
+  // USA
   'United States': 'USA',
+  // Iran
   'Iran': 'IR Iran',
-  'Czechia': 'Czechia',
+  // Bosnia
   'Bosnia and Herzegovina': 'Bosnia & Herz.',
+  'Bosnia-Herzegovina': 'Bosnia & Herz.',
+  'Bosnia & Herzegovina': 'Bosnia & Herz.',
+  // Congo
   'Congo DR': 'Congo DR',
-  "DR Congo": 'Congo DR',
+  'DR Congo': 'Congo DR',
   'Democratic Republic of Congo': 'Congo DR',
+  'Democratic Republic of the Congo': 'Congo DR',
+  // Turkey
   'Türkiye': 'Türkiye',
   'Turkey': 'Türkiye',
+  // Korea
   'Korea Republic': 'Korea Republic',
+  'South Korea': 'Korea Republic',
+  'Republic of Korea': 'Korea Republic',
+  // Cape Verde
   'Cape Verde': 'Cabo Verde',
+  'Cape Verde Islands': 'Cabo Verde',
+  // Curacao
   'Curacao': 'Curaçao',
+  // Ivory Coast
+  'Ivory Coast': "Côte d'Ivoire",
+  "Cote d'Ivoire": "Côte d'Ivoire",
+  'Côte d\'Ivoire': "Côte d'Ivoire",
 }
 
 // ── Group letter from API's group field ─────────────────────────────────────
@@ -104,21 +114,33 @@ async function sbPatch(path, body) {
 }
 
 async function sbInsert(rows) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/matches`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
-    },
-    body: JSON.stringify(rows),
-  })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Insert failed: ${text}`)
+  let inserted = 0, skipped = 0
+  for (const row of rows) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/matches`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify(row),
+    })
+    if (res.ok) {
+      console.log(`   \u2705 Inserted: ${row.home_team} vs ${row.away_team}`)
+      inserted++
+    } else {
+      const text = await res.text()
+      const parsed = JSON.parse(text)
+      if (parsed.code === '23505') {
+        console.log(`   \u23ed\ufe0f  Skipped (duplicate): ${row.home_team} vs ${row.away_team}`)
+        skipped++
+      } else {
+        console.log(`   \u274c Failed: ${row.home_team} vs ${row.away_team} -- ${parsed.message}`)
+      }
+    }
   }
-  return res.json()
+  return { inserted, skipped }
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -198,8 +220,8 @@ async function run() {
     toInsert.forEach(m =>
       console.log(`   ${m.home_team} vs ${m.away_team} | ${m.group_name} | ${m.kickoff_time} | flags: ${m.home_flag}${m.away_flag}`)
     )
-    const inserted = await sbInsert(toInsert)
-    console.log(`\n✅ Inserted ${inserted.length} matches!`)
+    const result = await sbInsert(toInsert)
+    console.log('\n✅ Done! Inserted: ' + result.inserted + ', skipped: ' + result.skipped)
   }
 
   console.log('\n🎉 Fixture sync complete!')
