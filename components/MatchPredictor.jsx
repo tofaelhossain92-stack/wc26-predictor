@@ -43,10 +43,13 @@ function LiveMatchInfo({ match }) {
     <>
       {goalTimes.length > 0 && (
         <div style={{ marginTop: 14, padding: '0 4px' }}>
-          {goalTimes.map((g, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0', flexDirection: g.team === 'away' ? 'row-reverse' : 'row' }}>
+          {goalTimes.sort((a,b) => (a.min||0) - (b.min||0)).map((g, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', flexDirection: g.team === 'away' ? 'row-reverse' : 'row' }}>
               <span style={{ fontSize: 13 }}>⚽</span>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 8px' }}>{g.min}'</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>{g.min}'</span>
+              {g.player && (
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.player}</span>
+              )}
             </div>
           ))}
         </div>

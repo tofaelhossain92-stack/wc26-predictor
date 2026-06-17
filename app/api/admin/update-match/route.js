@@ -7,7 +7,7 @@ const ADMIN_PASSWORD = 'wc26admin'
 
 export async function POST(req) {
   const body = await req.json()
-  const { password, matchId, status, home_goals, away_goals, match_period, kickoff_time } = body
+  const { password, matchId, status, home_goals, away_goals, match_period, kickoff_time, goal_times } = body
 
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
@@ -19,6 +19,7 @@ export async function POST(req) {
   if (kickoff_time)               updates.kickoff_time = new Date(kickoff_time).toISOString()
   if (home_goals !== '')          updates.home_goals   = parseInt(home_goals, 10)
   if (away_goals !== '')          updates.away_goals   = parseInt(away_goals, 10)
+  if (goal_times !== undefined)   updates.goal_times   = goal_times
 
   const { error } = await supabaseAdmin
     .from('matches')
