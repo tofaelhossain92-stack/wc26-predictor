@@ -80,7 +80,45 @@ function LiveMatchInfo({ match }) {
   )
 }
 
+function useLivePeriod(match) {
+  const [period, setPeriod] = useState(match.match_period)
+
+  useEffect(() => {
+    if (match.status !== 'live') { setPeriod(match.match_period); return }
+    if (match.match_period === 'HT' || match.match_period === 'FT') { setPeriod(match.match_period); return }
+
+    // Parse the stored period (e.g. "67:23'") and tick seconds forward
+    const parsePeriod = (p) => {
+      if (!p) return null
+      const m = p.match(/^(\d+):(\d+)'$/)
+      if (m) return { mins: parseInt(m[1]), secs: parseInt(m[2]), plus: false }
+      const m2 = p.match(/^(\d+)\+:(\d+)'$/)
+      if (m2) return { mins: parseInt(m2[1]), secs: parseInt(m2[2]), plus: true }
+      return null
+    }
+
+    const parsed = parsePeriod(match.match_period)
+    if (!parsed) { setPeriod(match.match_period); return }
+
+    let { mins, secs, plus } = parsed
+    const pad = (n) => String(n).padStart(2, '0')
+
+    const tick = () => {
+      secs++
+      if (secs >= 60) { secs = 0; mins++ }
+      const display = plus ? `${parsed.mins}+:${pad(secs)}'` : `${mins}:${pad(secs)}'`
+      setPeriod(display)
+    }
+
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
+  }, [match.match_period, match.status])
+
+  return period
+}
+
 function MatchCard({ match, prediction, onPredict }) {
+  const livePeriod = useLivePeriod(match)
   const [homeG, setHomeG] = useState(prediction?.predictedHome ?? '')
   const [awayG, setAwayG] = useState(prediction?.predictedAway ?? '')
   const [saving, setSaving] = useState(false)
@@ -191,7 +229,7 @@ function MatchCard({ match, prediction, onPredict }) {
           </span>
           {match.status === 'live' && (
             <span className="pulsing" style={{ background: 'rgba(200,16,46,0.15)', color: '#C8102E', border: '1px solid rgba(200,16,46,0.4)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700 }}>
-              🔴 {match.match_period === 'HT' ? 'HALF TIME' : match.match_period ? `LIVE ${match.match_period}` : 'LIVE'}
+              🔴 {livePeriod === 'HT' ? 'HALF TIME' : livePeriod ? `LIVE ${livePeriod}` : 'LIVE'}
             </span>
           )}
           {match.status === 'done' && (
@@ -270,7 +308,7 @@ function MatchCard({ match, prediction, onPredict }) {
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span className="pulsing" style={{ color: '#C8102E', fontSize: 11, fontWeight: 700 }}>●</span>
-                  <span style={{ color: '#C8102E', fontSize: 13, fontWeight: 800, textShadow: '0 0 8px rgba(200,16,46,0.5)' }}>{match.match_period || 'LIVE'}</span>
+                  <span style={{ color: '#C8102E', fontSize: 13, fontWeight: 800, textShadow: '0 0 8px rgba(200,16,46,0.5)' }}>{livePeriod || 'LIVE'}</span>
                 </div>
               )}
             </div>

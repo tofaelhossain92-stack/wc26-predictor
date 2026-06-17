@@ -31,16 +31,23 @@ function mapStatus(s) {
   return 'upcoming'
 }
 
-function mapPeriod(apiMatch, elapsedMins) {
+function mapPeriod(apiMatch, elapsedSecs) {
   const s = apiMatch.status
   if (s === 'PAUSED')   return 'HT'
   if (s === 'FINISHED') return 'FT'
   if (s === 'IN_PLAY') {
-    if (elapsedMins <= 47)      return `${Math.min(elapsedMins, 45)}'`
-    else if (elapsedMins <= 62) return `45+'`
-    else {
-      const min = elapsedMins - 22
-      return min <= 90 ? `${min}'` : `90+'`
+    const elapsedMins = Math.floor(elapsedSecs / 60)
+    const secs        = elapsedSecs % 60
+    const pad         = (n) => String(n).padStart(2, '0')
+    if (elapsedMins <= 47) {
+      const displayMin = Math.min(elapsedMins, 45)
+      return `${displayMin}:${pad(secs)}'`
+    } else if (elapsedMins <= 62) {
+      return `45+:${pad(secs)}'`
+    } else {
+      const min2nd = elapsedMins - 22
+      if (min2nd <= 90) return `${min2nd}:${pad(secs)}'`
+      return `90+:${pad(secs)}'`
     }
   }
   return null
@@ -143,8 +150,9 @@ export async function GET() {
         : (apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0)
       const newStatus  = mapStatus(apiMatch.status)
       const kickoffTime = new Date(match.kickoff_time)
-      const elapsedMins = Math.floor((now - kickoffTime) / 60000)
-      const matchPeriod = mapPeriod(apiMatch, elapsedMins)
+      const elapsedSecs = Math.floor((now - kickoffTime) / 1000)
+      const elapsedMins = Math.floor(elapsedSecs / 60)
+      const matchPeriod = mapPeriod(apiMatch, elapsedSecs)
 
       // Track goal times
       const prevHome = match.home_goals ?? 0
