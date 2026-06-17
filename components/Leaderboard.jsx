@@ -29,8 +29,9 @@ function PredictionHistory({ predictions }) {
   return (
     <div style={{ marginTop: 12 }}>
       {predictions.map(p => {
-        const isCorrect = p.pointsEarned >= 3
-        const isExact   = p.pointsEarned === 10
+        const pts       = parseInt(p.pointsEarned, 10) || 0
+        const isCorrect = pts >= 3
+        const isExact   = pts === 10
         const isDone    = p.matchStatus === 'done'
 
         return (
@@ -59,7 +60,7 @@ function PredictionHistory({ predictions }) {
                   color: isCorrect ? '#00c896' : 'rgba(255,255,255,0.3)',
                   fontWeight: 700, fontSize: 15,
                 }}>
-                  {isExact ? '🎯' : isCorrect ? '✓' : '✗'} {p.pointsEarned}
+                  {isExact ? '🎯' : isCorrect ? '✓' : '✗'} {pts}
                 </span>
               ) : (
                 <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>

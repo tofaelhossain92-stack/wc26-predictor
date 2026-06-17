@@ -45,7 +45,7 @@ export async function GET() {
           predictedAway: p.away_goals,
           actualHome:   p.match?.home_goals,
           actualAway:   p.match?.away_goals,
-          pointsEarned: p.points_earned,
+          pointsEarned: parseInt(p.points_earned, 10) || 0,
           submittedAt:  p.submitted_at,
         })),
       stats: computeStats(predictions.filter(p => p.user_id === user.id)),
@@ -59,9 +59,9 @@ export async function GET() {
 
 function computeStats(predictions) {
   const finished = predictions.filter(p => p.match?.status === 'done')
-  const correct  = finished.filter(p => p.points_earned >= 3)
-  const exact    = finished.filter(p => p.points_earned === 10)
-  const highGoal = predictions.filter(p => (p.home_goals + p.away_goals) >= 4)
+  const correct  = finished.filter(p => parseInt(p.points_earned, 10) >= 3)
+  const exact    = finished.filter(p => parseInt(p.points_earned, 10) === 10)
+  const highGoal = predictions.filter(p => (parseInt(p.home_goals,10) + parseInt(p.away_goals,10)) >= 4)
 
   return {
     totalPredictions: predictions.length,
