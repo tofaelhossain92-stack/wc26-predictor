@@ -78,19 +78,28 @@ export default function GameClient() {
     Promise.all([fetchMatches(), fetchLeaderboard()]).then(() => setLoading(false))
   }, [user, fetchMatches, fetchLeaderboard])
 
-  // Live score polling — runs every 60s when a live match exists
+  // Live score polling — refresh DB from API + pull fresh data from DB
   useEffect(() => {
     const now = new Date()
     const hasLive = matches.some(m => {
-      const kickoff = new Date(m.kickoff_time)
+      const kickoff      = new Date(m.kickoff_time)
       const kickoffPlus90 = new Date(kickoff.getTime() + 110 * 60 * 1000)
       return m.status === 'live' || (m.status === 'upcoming' && now >= kickoff && now <= kickoffPlus90)
     })
     if (!hasLive) return
-    // Sync immediately on load
-    fetchMatches()
-    // Then every 15s
-    const interval = setInterval(() => fetchMatches(), 15000)
+
+    // Trigger API sync + refresh display every 30s during live matches
+    const syncAndRefresh = async () => {
+      try {
+        // 1. Tell server to fetch latest from API-Football
+        await fetch('/api/live-scores', { cache: 'no-store' })
+      } catch {}
+      // 2. Pull fresh data from DB to update UI
+      await fetchMatches()
+    }
+
+    syncAndRefresh() // run immediately
+    const interval = setInterval(syncAndRefresh, 30000) // then every 30s
     return () => clearInterval(interval)
   }, [matches, fetchMatches])
 
