@@ -319,29 +319,36 @@ function MatchCard({ match, prediction, onPredict }) {
       </div>
 
       {/* Last 5 Form — shown for upcoming matches before prediction is locked */}
-      {match.status === 'upcoming' && !saved && !locked && match.form && (match.form.home?.length > 0 || match.form.away?.length > 0) && (
-        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {[
-            { team: match.home_team, form: match.form?.home || [] },
-            { team: match.away_team, form: match.form?.away || [] },
-          ].map(({ team, form }) => form?.length ? (
-            <div key={team} style={{ textAlign: 'center' }}>
-              <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>LAST 5</div>
-              <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-                {form.slice(-5).map((r, i) => (
-                  <span key={i} style={{
-                    width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 9, fontWeight: 800,
-                    background: r === 'W' ? 'rgba(0,200,100,0.2)' : r === 'D' ? 'rgba(255,200,0,0.2)' : 'rgba(200,16,46,0.2)',
-                    color:      r === 'W' ? '#00c864'             : r === 'D' ? '#f5c518'              : '#C8102E',
-                    border: `1px solid ${r === 'W' ? 'rgba(0,200,100,0.4)' : r === 'D' ? 'rgba(255,200,0,0.4)' : 'rgba(200,16,46,0.4)'}`,
-                  }}>{r}</span>
-                ))}
-              </div>
+      {(() => {
+        try {
+          const homeForm = Array.isArray(match.form?.home) ? match.form.home : []
+          const awayForm = Array.isArray(match.form?.away) ? match.form.away : []
+          if (match.status !== 'upcoming' || saved || locked) return null
+          if (!homeForm.length && !awayForm.length) return null
+          return (
+            <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {[{ team: match.home_team, form: homeForm }, { team: match.away_team, form: awayForm }].map(({ team, form }) =>
+                form.length ? (
+                  <div key={team} style={{ textAlign: 'center' }}>
+                    <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>LAST 5</div>
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                      {form.slice(-5).map((r, i) => (
+                        <span key={i} style={{
+                          width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 9, fontWeight: 800,
+                          background: r === 'W' ? 'rgba(0,200,100,0.2)' : r === 'D' ? 'rgba(255,200,0,0.2)' : 'rgba(200,16,46,0.2)',
+                          color:      r === 'W' ? '#00c864' : r === 'D' ? '#f5c518' : '#C8102E',
+                          border: `1px solid ${r === 'W' ? 'rgba(0,200,100,0.4)' : r === 'D' ? 'rgba(255,200,0,0.4)' : 'rgba(200,16,46,0.4)'}`,
+                        }}>{r}</span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null
+              )}
             </div>
-          ) : null)}
-        </div>
-      )}
+          )
+        } catch { return null }
+      })()}
 
       {/* Goal times + Win probability */}
       {match.status === 'live' && <LiveMatchInfo match={match} />}
