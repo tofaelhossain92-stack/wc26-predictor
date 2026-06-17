@@ -1,5 +1,28 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+
+// ── FIFA Rankings (March 2026) ─────────────────────────────────────────────
+const FIFA_RANKINGS = {
+  'Argentina':      1,  'Spain':          2,  'France':         3,
+  'England':        4,  'Brazil':         5,  'Portugal':       6,
+  'Netherlands':    7,  'Belgium':        8,  'Germany':        9,
+  'Uruguay':        10, 'Colombia':       11, 'Morocco':        12,
+  'Italy':          13, 'USA':            14, 'Mexico':         15,
+  'Japan':          16, 'Ecuador':        17, 'Croatia':        18,
+  'Senegal':        19, 'Switzerland':    20, 'Denmark':        21,
+  'Korea Republic': 22, 'Austria':        23, 'Australia':      24,
+  'Türkiye':        25, 'IR Iran':        26, 'Norway':         27,
+  'Ukraine':        28, 'Hungary':        29, 'Scotland':       30,
+  'Poland':         31, 'Serbia':         32, 'Qatar':          33,
+  'Czechia':        34, 'Algeria':        35, 'Paraguay':       36,
+  'Sweden':         37, 'Ghana':          38, 'Saudi Arabia':   39,
+  'Cabo Verde':     40, 'Canada':         41, 'Tunisia':        42,
+  'South Africa':   43, 'Iraq':           44, 'Panama':         45,
+  'Uzbekistan':     46, 'Jordan':         47, 'Curaçao':        48,
+  'New Zealand':    49, "Côte d'Ivoire": 50, 'Egypt':          51,
+  'Bosnia & Herz.': 52, 'Congo DR':       53, 'Haiti':          54,
+  'Guatemala':      55, 'Bolivia':        56,
+}
 
 function safeParseJSON(val) {
   if (!val) return null
@@ -195,7 +218,13 @@ function MatchCard({ match, prediction, onPredict }) {
         {/* Home */}
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
-          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.home_team}</div>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{match.home_team}</div>
+          {FIFA_RANKINGS[match.home_team] && (
+            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 10 }}>
+              FIFA #{FIFA_RANKINGS[match.home_team]}
+            </div>
+          )}
+          {!FIFA_RANKINGS[match.home_team] && <div style={{ marginBottom: 12 }} />}
           {(saved || locked) && homeG !== '' ? (
             <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {homeG}
@@ -257,7 +286,13 @@ function MatchCard({ match, prediction, onPredict }) {
         {/* Away */}
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
-          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 12 }}>{match.away_team}</div>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{match.away_team}</div>
+          {FIFA_RANKINGS[match.away_team] && (
+            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 10 }}>
+              FIFA #{FIFA_RANKINGS[match.away_team]}
+            </div>
+          )}
+          {!FIFA_RANKINGS[match.away_team] && <div style={{ marginBottom: 12 }} />}
           {(saved || locked) && awayG !== '' ? (
             <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {awayG}
@@ -284,6 +319,31 @@ function MatchCard({ match, prediction, onPredict }) {
           )}
         </div>
       </div>
+
+      {/* Last 5 Form — shown for upcoming matches before prediction is locked */}
+      {match.status === 'upcoming' && !saved && !locked && match.form && (
+        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            { team: match.home_team, form: match.form?.home },
+            { team: match.away_team, form: match.form?.away },
+          ].map(({ team, form }) => form?.length ? (
+            <div key={team} style={{ textAlign: 'center' }}>
+              <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>LAST 5</div>
+              <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+                {form.slice(-5).map((r, i) => (
+                  <span key={i} style={{
+                    width: 20, height: 20, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 9, fontWeight: 800,
+                    background: r === 'W' ? 'rgba(0,200,100,0.2)' : r === 'D' ? 'rgba(255,200,0,0.2)' : 'rgba(200,16,46,0.2)',
+                    color:      r === 'W' ? '#00c864'             : r === 'D' ? '#f5c518'              : '#C8102E',
+                    border: `1px solid ${r === 'W' ? 'rgba(0,200,100,0.4)' : r === 'D' ? 'rgba(255,200,0,0.4)' : 'rgba(200,16,46,0.4)'}`,
+                  }}>{r}</span>
+                ))}
+              </div>
+            </div>
+          ) : null)}
+        </div>
+      )}
 
       {/* Goal times + Win probability */}
       {match.status === 'live' && <LiveMatchInfo match={match} />}
@@ -351,11 +411,23 @@ function MatchCard({ match, prediction, onPredict }) {
   )
 }
 
-export default function MatchPredictor({ matches, user, leaderboard, onPredicted }) {
+export default function MatchPredictor({ matches, user, leaderboard, onPredicted, formData = {} }) {
   const [filterDate, setFilterDate] = useState(() => {
     const today = new Date()
     return today.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
   })
+  const dateScrollRef   = useRef(null)
+  const activeDateRef   = useRef(null)
+
+  // Auto-scroll date tabs so today is visible on mount
+  useEffect(() => {
+    if (activeDateRef.current && dateScrollRef.current) {
+      const container = dateScrollRef.current
+      const el        = activeDateRef.current
+      const offset    = el.offsetLeft - container.offsetWidth / 2 + el.offsetWidth / 2
+      container.scrollTo({ left: offset, behavior: 'smooth' })
+    }
+  }, [])
 
   // Auto-switch to 'All' if no matches on today's date  
   const todayStr = new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })
@@ -420,28 +492,38 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
       )}
 
       {/* Date filter */}
-<div style={{
+<div ref={dateScrollRef} style={{
   display: 'flex', gap: 8, marginBottom: 20,
   overflowX: 'auto', paddingBottom: 6,
-  scrollbarWidth: 'none', /* Firefox */
-  msOverflowStyle: 'none', /* IE */
+  scrollbarWidth: 'none',
+  msOverflowStyle: 'none',
 }}>
   {dates.map(d => (
-    <button key={d} onClick={() => setFilterDate(d)} style={{
-      padding: '6px 14px', borderRadius: 20,
-      flexShrink: 0, whiteSpace: 'nowrap',
-      background: filterDate === d ? 'rgba(245,197,24,0.15)' : 'rgba(255,255,255,0.04)',
-      border: filterDate === d ? '1px solid rgba(245,197,24,0.4)' : '1px solid rgba(255,255,255,0.08)',
-      color: filterDate === d ? '#f5c518' : 'rgba(255,255,255,0.4)',
-      fontSize: 12, cursor: 'pointer', fontWeight: filterDate === d ? 700 : 400, transition: 'all 0.15s',
-    }}>{d}</button>
+    <button
+      key={d}
+      ref={d === filterDate ? activeDateRef : null}
+      onClick={() => setFilterDate(d)}
+      style={{
+        padding: '6px 14px', borderRadius: 20,
+        flexShrink: 0, whiteSpace: 'nowrap',
+        background: filterDate === d ? 'rgba(245,197,24,0.15)' : 'rgba(255,255,255,0.04)',
+        border: filterDate === d ? '1px solid rgba(245,197,24,0.4)' : '1px solid rgba(255,255,255,0.08)',
+        color: filterDate === d ? '#f5c518' : 'rgba(255,255,255,0.4)',
+        fontSize: 12, cursor: 'pointer', fontWeight: filterDate === d ? 700 : 400, transition: 'all 0.15s',
+      }}>{d}</button>
   ))}
 </div>
 
       {filtered.map(match => (
         <MatchCard
           key={match.id}
-          match={match}
+          match={{
+            ...match,
+            form: {
+              home: formData[match.home_team] || [],
+              away: formData[match.away_team] || [],
+            }
+          }}
           prediction={myPredMap[match.id]}
           onPredict={{ userId: user.id, refresh: onPredicted }}
         />

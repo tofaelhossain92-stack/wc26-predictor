@@ -27,6 +27,7 @@ export default function GameClient() {
   const [loading, setLoading]         = useState(true)
   const [userChecked, setUserChecked]   = useState(false)
   const [notifGranted, setNotifGranted] = useState(false)
+  const [formData, setFormData]           = useState({})
 
   // Load user from localStorage
   useEffect(() => {
@@ -47,7 +48,22 @@ export default function GameClient() {
   const fetchMatches = useCallback(async () => {
     const res = await fetch('/api/matches', { cache: 'no-store' })
     const data = await res.json()
-    if (data.ok) setMatches(data.matches)
+    if (data.ok) {
+      setMatches(data.matches)
+      fetchForm(data.matches)
+    }
+  }, [fetchForm])
+
+  // Fetch team form for upcoming matches
+  const fetchForm = useCallback(async (matchList) => {
+    const upcoming = (matchList || []).filter(m => m.status === 'upcoming')
+    if (!upcoming.length) return
+    const teams = [...new Set(upcoming.flatMap(m => [m.home_team, m.away_team]))].join(',')
+    try {
+      const res  = await fetch(`/api/form?teams=${encodeURIComponent(teams)}`)
+      const data = await res.json()
+      setFormData(data)
+    } catch {}
   }, [])
 
   // Fetch leaderboard
@@ -171,7 +187,7 @@ export default function GameClient() {
 
       {/* Content */}
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px 90px 16px' }}>
-        {tab === 'predict'     && <MatchPredictor matches={matches} user={user} leaderboard={leaderboard} onPredicted={fetchLeaderboard} />}
+        {tab === 'predict' && <MatchPredictor matches={matches} user={user} leaderboard={leaderboard} onPredicted={fetchLeaderboard} formData={formData} />}
         {tab === 'standings'   && <Standings matches={matches} />}
         {tab === 'leaderboard' && <Leaderboard leaderboard={leaderboard} currentUserId={user.id} />}
         {tab === 'trash'       && <TrashTalk user={user} />}
