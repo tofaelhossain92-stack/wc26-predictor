@@ -1,54 +1,40 @@
 import { NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
-const API_FOOTBALL_KEY = process.env.API_FOOTBALL_KEY || '64289a1f1927dda393133add1c5c7124'
-const WC26_LEAGUE_ID = 1
-const WC26_SEASON = 2026
+const FOOTBALL_KEY = process.env.FOOTBALL_API_KEY || '151d22df20a0423e9f1346f8f4a35ce1'
 
 export async function GET() {
   const todayStr = new Date().toISOString().split('T')[0]
 
-  const [liveRes, todayRes] = await Promise.all([
-    fetch(`https://v3.football.api-sports.io/fixtures?league=${WC26_LEAGUE_ID}&season=${WC26_SEASON}&live=all`, {
-      headers: { 'x-apisports-key': API_FOOTBALL_KEY }
-    }),
-    fetch(`https://v3.football.api-sports.io/fixtures?league=${WC26_LEAGUE_ID}&season=${WC26_SEASON}&date=${todayStr}`, {
-      headers: { 'x-apisports-key': API_FOOTBALL_KEY }
-    })
-  ])
+  // Check football-data.org
+  const fdRes = await fetch(
+    `https://api.football-data.org/v4/competitions/2000/matches?dateFrom=${todayStr}&dateTo=${todayStr}`,
+    { headers: { 'X-Auth-Token': FOOTBALL_KEY }, cache: 'no-store' }
+  )
+  const fdData = await fdRes.json()
 
-  const liveData  = await liveRes.json()
-  const todayData = await todayRes.json()
+  // Check what's live in DB
+  const nowISO = new Date().toISOString()
+  const { data: dbMatches } = await supabaseAdmin
+    .from('matches')
+    .select('id,home_team,away_team,status,kickoff_time,match_period,api_match_id')
+    .or(`status.eq.live,and(status.eq.upcoming,kickoff_time.lte.${nowISO})`)
 
   return NextResponse.json({
     today: todayStr,
-    apiKey: API_FOOTBALL_KEY ? '✅ set' : '❌ missing',
-    live: {
-      count: liveData?.response?.length || 0,
-      error: liveData?.errors,
-      fixtures: (liveData?.response || []).map(f => ({
-        id: f.fixture.id,
-        home: f.teams.home.name,
-        away: f.teams.away.name,
-        status: f.fixture.status.short,
-        elapsed: f.fixture.status.elapsed,
-        score: f.goals,
-        league: f.league.id,
+    footballDataOrg: {
+      status: fdRes.status,
+      matchCount: fdData?.matches?.length || 0,
+      error: fdData?.message || null,
+      matches: (fdData?.matches || []).map(m => ({
+        home: m.homeTeam?.name,
+        away: m.awayTeam?.name,
+        status: m.status,
+        score: m.score?.fullTime,
       }))
     },
-    todayFixtures: {
-      count: todayData?.response?.length || 0,
-      error: todayData?.errors,
-      fixtures: (todayData?.response || []).map(f => ({
-        id: f.fixture.id,
-        home: f.teams.home.name,
-        away: f.teams.away.name,
-        status: f.fixture.status.short,
-        elapsed: f.fixture.status.elapsed,
-        score: f.goals,
-        league: f.league.id,
-      }))
-    }
+    dbLiveMatches: dbMatches || [],
   })
 }
