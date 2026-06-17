@@ -44,16 +44,6 @@ export default function GameClient() {
     }
   }, [router])
 
-  // Fetch matches from Supabase
-  const fetchMatches = useCallback(async () => {
-    const res = await fetch('/api/matches', { cache: 'no-store' })
-    const data = await res.json()
-    if (data.ok) {
-      setMatches(data.matches)
-      fetchForm(data.matches)
-    }
-  }, [fetchForm])
-
   // Fetch team form for upcoming matches
   const fetchForm = useCallback(async (matchList) => {
     const upcoming = (matchList || []).filter(m => m.status === 'upcoming')
@@ -65,6 +55,16 @@ export default function GameClient() {
       setFormData(data)
     } catch {}
   }, [])
+
+  // Fetch matches from Supabase
+  const fetchMatches = useCallback(async () => {
+    const res = await fetch('/api/matches', { cache: 'no-store' })
+    const data = await res.json()
+    if (data.ok) {
+      setMatches(data.matches)
+      fetchForm(data.matches)
+    }
+  }, [fetchForm])
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {

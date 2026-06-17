@@ -219,12 +219,11 @@ function MatchCard({ match, prediction, onPredict }) {
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{match.home_team}</div>
-          {FIFA_RANKINGS[match.home_team] && (
+          {FIFA_RANKINGS[match.home_team] ? (
             <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 10 }}>
               FIFA #{FIFA_RANKINGS[match.home_team]}
             </div>
-          )}
-          {!FIFA_RANKINGS[match.home_team] && <div style={{ marginBottom: 12 }} />}
+          ) : <div style={{ marginBottom: 12 }} />}
           {(saved || locked) && homeG !== '' ? (
             <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {homeG}
@@ -287,12 +286,11 @@ function MatchCard({ match, prediction, onPredict }) {
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{match.away_team}</div>
-          {FIFA_RANKINGS[match.away_team] && (
+          {FIFA_RANKINGS[match.away_team] ? (
             <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 10 }}>
               FIFA #{FIFA_RANKINGS[match.away_team]}
             </div>
-          )}
-          {!FIFA_RANKINGS[match.away_team] && <div style={{ marginBottom: 12 }} />}
+          ) : <div style={{ marginBottom: 12 }} />}
           {(saved || locked) && awayG !== '' ? (
             <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {awayG}
@@ -321,11 +319,11 @@ function MatchCard({ match, prediction, onPredict }) {
       </div>
 
       {/* Last 5 Form — shown for upcoming matches before prediction is locked */}
-      {match.status === 'upcoming' && !saved && !locked && match.form && (
+      {match.status === 'upcoming' && !saved && !locked && match.form && (match.form.home?.length > 0 || match.form.away?.length > 0) && (
         <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[
-            { team: match.home_team, form: match.form?.home },
-            { team: match.away_team, form: match.form?.away },
+            { team: match.home_team, form: match.form?.home || [] },
+            { team: match.away_team, form: match.form?.away || [] },
           ].map(({ team, form }) => form?.length ? (
             <div key={team} style={{ textAlign: 'center' }}>
               <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>LAST 5</div>
