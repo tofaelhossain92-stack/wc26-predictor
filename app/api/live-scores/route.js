@@ -97,6 +97,11 @@ export async function GET() {
 
     if (!matches?.length) return NextResponse.json({ ok: true, updated: 0 })
 
+    // Filter out manually overridden matches — admin has taken control
+    const autoMatches = matches.filter(m => !m.manual_override)
+    const skipped     = matches.length - autoMatches.length
+    if (!autoMatches.length) return NextResponse.json({ ok: true, updated: 0, skipped })
+
     // Fetch today's matches from football-data.org
     const todayStr = now.toISOString().split('T')[0]
     const data = await fdFetch(`competitions/${WC_ID}/matches?dateFrom=${todayStr}&dateTo=${todayStr}`)
@@ -125,7 +130,7 @@ export async function GET() {
 
     let updated = 0
 
-    for (const match of matches) {
+    for (const match of autoMatches) {
       const key      = `${match.home_team}|${match.away_team}`
       const apiMatch = apiByTeams[key]
 

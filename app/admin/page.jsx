@@ -34,6 +34,7 @@ export default function AdminPage() {
         matchId: editing.id,
         ...form,
         goal_times: JSON.stringify(goals),
+        manual_override: form.manual_override,
       })
     })
     const data = await res.json()
@@ -80,11 +81,12 @@ export default function AdminPage() {
     } catch {}
     setGoals(existingGoals)
     setForm({
-      status:       match.status,
-      home_goals:   match.home_goals ?? '',
-      away_goals:   match.away_goals ?? '',
-      match_period: match.match_period ?? '',
-      kickoff_time: match.kickoff_time
+      status:          match.status,
+      home_goals:      match.home_goals ?? '',
+      away_goals:      match.away_goals ?? '',
+      match_period:    match.match_period ?? '',
+      manual_override: match.manual_override ?? false,
+      kickoff_time:    match.kickoff_time
         ? match.kickoff_time.replace('+00', '').replace(' ', 'T').slice(0, 16)
         : '',
     })
@@ -179,6 +181,7 @@ export default function AdminPage() {
                             {match.status.toUpperCase()} {match.match_period ? `· ${match.match_period}` : ''}
                           </span>
                           <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>Group {match.group_name}</span>
+                          {match.manual_override && <span style={{ fontSize: 10, color: '#ff4a4a', background: 'rgba(200,16,46,0.1)', borderRadius: 6, padding: '1px 6px', border: '1px solid rgba(200,16,46,0.3)' }}>🔒 Manual</span>}
                         </div>
                         <div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>
                           {match.home_flag} {match.home_team}
@@ -311,6 +314,22 @@ export default function AdminPage() {
               <input type="datetime-local" value={form.kickoff_time}
                 onChange={e => setForm(f => ({ ...f, kickoff_time: e.target.value }))}
                 style={inputStyle} />
+            </div>
+
+            {/* Manual Override Toggle */}
+            <div style={{ marginBottom: 20, padding: '14px 16px', borderRadius: 12, border: `1px solid ${form.manual_override ? 'rgba(200,16,46,0.4)' : 'rgba(255,255,255,0.08)'}`, background: form.manual_override ? 'rgba(200,16,46,0.08)' : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+              onClick={() => setForm(f => ({ ...f, manual_override: !f.manual_override }))}>
+              <div>
+                <div style={{ color: form.manual_override ? '#ff4a4a' : 'rgba(255,255,255,0.6)', fontWeight: 700, fontSize: 13 }}>
+                  🔒 Manual Override {form.manual_override ? 'ON' : 'OFF'}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 2 }}>
+                  {form.manual_override ? 'Cron will NOT overwrite this match' : 'Cron will auto-update this match'}
+                </div>
+              </div>
+              <div style={{ width: 44, height: 24, borderRadius: 12, background: form.manual_override ? '#C8102E' : 'rgba(255,255,255,0.15)', position: 'relative', transition: 'background 0.2s' }}>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: form.manual_override ? 22 : 2, transition: 'left 0.2s' }} />
+              </div>
             </div>
 
             {/* Actions */}
