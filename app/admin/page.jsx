@@ -310,12 +310,19 @@ export default function AdminPage() {
               <label style={labelStyle}>MATCH PERIOD</label>
               <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
                 {[
-                  { label: '⏸ HT', value: 'HT', status: 'live' },
-                  { label: '✓ FT', value: 'FT', status: 'done' },
+                  { label: '⏸ HT',     value: 'HT', status: 'live' },
+                  { label: '✓ FT',     value: 'FT', status: 'done' },
                 ].map(p => (
                   <button key={p.value} onClick={() => { setForm(f => ({ ...f, match_period: p.value, status: p.status, period_min: '', period_sec: '' })) }}
                     style={{ padding: '6px 16px', borderRadius: 8, border: `1px solid ${form.match_period === p.value ? 'rgba(201,168,76,0.5)' : 'rgba(255,255,255,0.1)'}`, background: form.match_period === p.value ? 'rgba(201,168,76,0.15)' : 'transparent', color: form.match_period === p.value ? '#C9A84C' : 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{p.label}</button>
                 ))}
+                {/* Resume from HT — starts 2nd half at 46:00 */}
+                {form.match_period === 'HT' && (
+                  <button onClick={() => setForm(f => ({ ...f, match_period: "46:00'", status: 'live', period_min: '46', period_sec: '00' }))}
+                    style={{ padding: '6px 16px', borderRadius: 8, border: '1px solid rgba(0,200,100,0.4)', background: 'rgba(0,200,100,0.1)', color: '#00c864', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                    ▶ 2nd Half
+                  </button>
+                )}
               </div>
               {/* Min : Sec input */}
               {form.match_period !== 'HT' && form.match_period !== 'FT' && (
