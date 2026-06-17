@@ -25,15 +25,21 @@ async function sbGet(path) {
 }
 
 async function sbPatch(path, body) {
-  await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method: 'PATCH',
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
+      'Prefer': 'return=minimal',
     },
     body: JSON.stringify(body),
   })
+  if (!res.ok) {
+    const text = await res.text()
+    console.error(`[settle] sbPatch error ${res.status} for ${path}:`, text)
+  }
+  return res
 }
 
 export async function GET(req) {
@@ -43,7 +49,7 @@ export async function GET(req) {
   }
 
   // Get all finished matches with valid scores
-  const matches = await sbGet(`matches?status=eq.done&home_goals=not.is.null&select=id,home_team,away_team,home_goals,away_goals`)
+  const matches = await sbGet(`matches?status=eq.done&select=id,home_team,away_team,home_goals,away_goals`)
 
   if (!Array.isArray(matches)) {
     return NextResponse.json({ ok: false, error: 'Failed to fetch matches', raw: matches }, { status: 500 })
@@ -52,8 +58,7 @@ export async function GET(req) {
   let settled = 0, skipped = 0
 
   for (const match of matches) {
-    if (match.home_goals === null || match.home_goals === undefined) continue
-    if (match.away_goals === null || match.away_goals === undefined) continue
+    if (match.home_goals == null || match.away_goals == null) continue
     const predictions = await sbGet(`predictions?match_id=eq.${match.id}&select=id,user_id,home_goals,away_goals`)
     if (!predictions?.length) { skipped++; continue }
 
