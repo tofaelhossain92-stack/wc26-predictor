@@ -13,9 +13,14 @@ const CRON_SECRET  = process.env.CRON_SECRET || 'wc26cron2026'
 
 async function sbGet(path) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Accept': 'application/json' },
     cache: 'no-store',
   })
+  if (!res.ok) {
+    const text = await res.text()
+    console.error(`[settle] sbGet error ${res.status} for ${path}:`, text)
+    return []
+  }
   return res.json()
 }
 
@@ -38,11 +43,17 @@ export async function GET(req) {
   }
 
   // Get all finished matches with valid scores
-  const matches = await sbGet(`matches?status=eq.done&home_goals=not.is.null&away_goals=not.is.null&select=id,home_team,away_team,home_goals,away_goals`)
+  const matches = await sbGet(`matches?status=eq.done&home_goals=not.is.null&select=id,home_team,away_team,home_goals,away_goals`)
+
+  if (!Array.isArray(matches)) {
+    return NextResponse.json({ ok: false, error: 'Failed to fetch matches', raw: matches }, { status: 500 })
+  }
 
   let settled = 0, skipped = 0
 
   for (const match of matches) {
+    if (match.home_goals === null || match.home_goals === undefined) continue
+    if (match.away_goals === null || match.away_goals === undefined) continue
     const predictions = await sbGet(`predictions?match_id=eq.${match.id}&select=id,user_id,home_goals,away_goals`)
     if (!predictions?.length) { skipped++; continue }
 
