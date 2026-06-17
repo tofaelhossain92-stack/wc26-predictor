@@ -83,39 +83,70 @@ function LiveMatchInfo({ match }) {
   )
 }
 
+function parsePeriod(p) {
+  if (!p) return null
+  const m1 = p.match(/^(\d+):(\d+)'$/)
+  if (m1) return { mins: parseInt(m1[1]), secs: parseInt(m1[2]), plus: false, baseMins: parseInt(m1[1]) }
+  const m2 = p.match(/^(\d+)\+:(\d+)'$/)
+  if (m2) return { mins: parseInt(m2[1]), secs: parseInt(m2[2]), plus: true, baseMins: parseInt(m2[1]) }
+  // Handle old format without seconds e.g. "67'"
+  const m3 = p.match(/^(\d+)'$/)
+  if (m3) return { mins: parseInt(m3[1]), secs: 0, plus: false, baseMins: parseInt(m3[1]) }
+  return null
+}
+
 function useLivePeriod(match) {
   const [period, setPeriod] = useState(match.match_period)
+  // Track the last synced period so we only reset ticker when DB gives us a newer time
+  const lastSyncedRef = useState(() => ({ period: match.match_period, ts: Date.now() }))[0]
 
   useEffect(() => {
     if (match.status !== 'live') { setPeriod(match.match_period); return }
     if (match.match_period === 'HT' || match.match_period === 'FT') { setPeriod(match.match_period); return }
 
-    // Parse the stored period (e.g. "67:23'") and tick seconds forward
-    const parsePeriod = (p) => {
-      if (!p) return null
-      const m = p.match(/^(\d+):(\d+)'$/)
-      if (m) return { mins: parseInt(m[1]), secs: parseInt(m[2]), plus: false }
-      const m2 = p.match(/^(\d+)\+:(\d+)'$/)
-      if (m2) return { mins: parseInt(m2[1]), secs: parseInt(m2[2]), plus: true }
-      return null
-    }
-
     const parsed = parsePeriod(match.match_period)
-    if (!parsed) { setPeriod(match.match_period); return }
+    if (!parsed) { setPeriod(match.match_period || 'LIVE'); return }
 
-    let { mins, secs, plus } = parsed
     const pad = (n) => String(n).padStart(2, '0')
+
+    // Calculate how many seconds have elapsed since DB was last written
+    // so we start the ticker from the correct current time
+    const secondsSinceSync = Math.floor((Date.now() - lastSyncedRef.ts) / 1000)
+    let totalSecs = parsed.mins * 60 + parsed.secs + secondsSinceSync
+    let mins = Math.floor(totalSecs / 60)
+    let secs = totalSecs % 60
+
+    // Update sync reference
+    lastSyncedRef.period = match.match_period
+    lastSyncedRef.ts     = Date.now()
 
     const tick = () => {
       secs++
       if (secs >= 60) { secs = 0; mins++ }
-      const display = plus ? `${parsed.mins}+:${pad(secs)}'` : `${mins}:${pad(secs)}'`
-      setPeriod(display)
+      // Cap at 90+
+      if (!parsed.plus && mins >= 90) {
+        const extraSecs = (mins - 90) * 60 + secs
+        const extraMins = Math.floor(extraSecs / 60)
+        const remSecs   = extraSecs % 60
+        setPeriod(`90+${extraMins > 0 ? extraMins : ''}:${pad(remSecs)}'`)
+      } else {
+        setPeriod(parsed.plus ? `${parsed.baseMins}+:${pad(secs)}'` : `${mins}:${pad(secs)}'`)
+      }
+    }
+
+    // Set initial display immediately
+    if (!parsed.plus && mins >= 90) {
+      const extraSecs = (mins - 90) * 60 + secs
+      const extraMins = Math.floor(extraSecs / 60)
+      const remSecs   = extraSecs % 60
+      setPeriod(`90+${extraMins > 0 ? extraMins : ''}:${pad(remSecs)}'`)
+    } else {
+      setPeriod(parsed.plus ? `${parsed.baseMins}+:${pad(secs)}'` : `${mins}:${pad(secs)}'`)
     }
 
     const interval = setInterval(tick, 1000)
     return () => clearInterval(interval)
-  }, [match.match_period, match.status])
+  }, [match.match_period, match.status]) // eslint-disable-line
 
   return period
 }
