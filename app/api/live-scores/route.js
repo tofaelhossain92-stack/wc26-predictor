@@ -1,52 +1,51 @@
 // GET /api/live-scores
-// Uses API-Football (api-football.com) for accurate live data
-// Called by cron-job.org every 2 minutes
+// Uses football-data.org (free tier supports WC 2026)
+// Called by cron-job.org every 2 minutes + client every 30s during live matches
 
-import { NextResponse }              from 'next/server'
-import { calcPoints }                from '@/lib/points'
-import { notifyResultIn, sendPush }  from '@/lib/onesignal'
-import { supabaseAdmin }             from '@/lib/supabase'
+import { NextResponse }             from 'next/server'
+import { calcPoints }               from '@/lib/points'
+import { notifyResultIn, sendPush } from '@/lib/onesignal'
+import { supabaseAdmin }            from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
-const API_FOOTBALL_KEY = process.env.API_FOOTBALL_KEY || '64289a1f1927dda393133add1c5c7124'
-const WC26_LEAGUE_ID   = 1 // FIFA World Cup
-const WC26_SEASON      = 2026
+const FOOTBALL_KEY = process.env.FOOTBALL_API_KEY || '151d22df20a0423e9f1346f8f4a35ce1'
+const WC_ID        = 2000 // football-data.org World Cup competition ID
 
-// ── API-Football helpers ──────────────────────────────────────────────────
-async function apiFetch(path) {
-  const res = await fetch(`https://v3.football.api-sports.io/${path}`, {
-    headers: {
-      'x-apisports-key': API_FOOTBALL_KEY,
-    },
+async function fdFetch(path) {
+  const res = await fetch(`https://api.football-data.org/v4/${path}`, {
+    headers: { 'X-Auth-Token': FOOTBALL_KEY },
     cache: 'no-store',
   })
   if (!res.ok) {
-    console.error(`[api-football] ${res.status} for ${path}`)
+    console.error(`[football-data] ${res.status} ${path}`)
     return null
   }
   return res.json()
 }
 
-// Map API-Football status → our status
-function mapStatus(apiStatus) {
-  const LIVE    = ['1H', '2H', 'ET', 'BT', 'P', 'INT', 'LIVE']
-  const HT      = ['HT']
-  const DONE    = ['FT', 'AET', 'PEN']
-  if (LIVE.includes(apiStatus))     return 'live'
-  if (HT.includes(apiStatus))       return 'live' // half time is still live
-  if (DONE.includes(apiStatus))     return 'done'
+function mapStatus(s) {
+  if (['SCHEDULED','TIMED'].includes(s))  return 'upcoming'
+  if (['IN_PLAY','PAUSED'].includes(s))   return 'live'
+  if (['FINISHED'].includes(s))           return 'done'
   return 'upcoming'
 }
 
-function mapPeriod(apiStatus, elapsed) {
-  if (apiStatus === 'HT')  return 'HT'
-  if (['FT','AET','PEN'].includes(apiStatus)) return 'FT'
-  if (elapsed != null)     return `${elapsed}'`
+function mapPeriod(apiMatch, elapsedMins) {
+  const s = apiMatch.status
+  if (s === 'PAUSED')   return 'HT'
+  if (s === 'FINISHED') return 'FT'
+  if (s === 'IN_PLAY') {
+    if (elapsedMins <= 47)      return `${Math.min(elapsedMins, 45)}'`
+    else if (elapsedMins <= 62) return `45+'`
+    else {
+      const min = elapsedMins - 22
+      return min <= 90 ? `${min}'` : `90+'`
+    }
+  }
   return null
 }
 
-// ── Settlement (using supabaseAdmin for reliable writes) ──────────────────
 async function settleMatch(matchId, homeGoals, awayGoals, match) {
   if (homeGoals == null || awayGoals == null) return
 
@@ -62,7 +61,6 @@ async function settleMatch(matchId, homeGoals, awayGoals, match) {
     await supabaseAdmin.from('predictions').update({ points_earned: pts }).eq('id', pred.id)
   }
 
-  // Recalculate totals for affected users
   const userIds = [...new Set(preds.map(p => p.user_id))]
   for (const userId of userIds) {
     const { data: allPreds } = await supabaseAdmin
@@ -78,13 +76,12 @@ async function settleMatch(matchId, homeGoals, awayGoals, match) {
   ).catch(() => {})
 }
 
-// ── Main handler ──────────────────────────────────────────────────────────
 export async function GET() {
   try {
     const now    = new Date()
     const nowISO = now.toISOString()
 
-    // 1. Get live + just-started upcoming matches from our DB
+    // Get live + just-started matches from DB
     const { data: matches } = await supabaseAdmin
       .from('matches')
       .select('*')
@@ -93,114 +90,88 @@ export async function GET() {
 
     if (!matches?.length) return NextResponse.json({ ok: true, updated: 0 })
 
-    // 2. Fetch live fixtures from API-Football for WC26
-    const liveData = await apiFetch(`fixtures?league=${WC26_LEAGUE_ID}&season=${WC26_SEASON}&live=all`)
-    const liveFixtures = liveData?.response || []
-
-    // Also fetch today's matches (live + finished) in case cron missed the live window
+    // Fetch today's matches from football-data.org
     const todayStr = now.toISOString().split('T')[0]
-    const todayData = await apiFetch(`fixtures?league=${WC26_LEAGUE_ID}&season=${WC26_SEASON}&date=${todayStr}`)
-    const todayFixtures = todayData?.response || []
+    const data = await fdFetch(`competitions/${WC_ID}/matches?dateFrom=${todayStr}&dateTo=${todayStr}`)
+    const apiMatches = data?.matches || []
 
-    // Merge: live takes priority, today fills in finished
-    const allFixtures = [...liveFixtures]
-    for (const f of todayFixtures) {
-      if (!allFixtures.find(x => x.fixture.id === f.fixture.id)) {
-        allFixtures.push(f)
-      }
-    }
+    console.log(`[live-scores] football-data.org returned ${apiMatches.length} matches for ${todayStr}`)
 
-    console.log(`[live-scores] API-Football returned ${allFixtures.length} fixtures for today`)
+    // Build lookup by team names (normalize common variants)
+    const normalize = (n = '') => n
+      .replace('Iran', 'IR Iran')
+      .replace('United States', 'USA')
+      .replace('South Korea', 'Korea Republic')
+      .replace('Republic of Korea', 'Korea Republic')
+      .replace(/Ivory Coast|Cote d'Ivoire/, "Côte d'Ivoire")
+      .replace(/Cape Verde Islands?/, 'Cabo Verde')
+      .replace(/Bosnia[- ]Herzegovina|Bosnia and Herzegovina/, 'Bosnia & Herz.')
+      .replace(/DR Congo|Democratic Republic.*Congo/, 'Congo DR')
+      .replace('Turkey', 'Türkiye')
+      .replace('Curacao', 'Curaçao')
 
-    // Build lookup by team names (primary — our api_match_id is from football-data.org, not API-Football)
-    const fixtureByTeams = {}
-    for (const f of allFixtures) {
-      // Index by API-Football team names
-      const key = `${f.teams.home.name}|${f.teams.away.name}`
-      fixtureByTeams[key] = f
-    }
-
-    // Also build a flexible lookup that handles name differences
-    const fixtureByTeamsFlexible = {}
-    for (const f of allFixtures) {
-      // Normalize common name variants
-      const normalize = (n) => n
-        .replace('Iran', 'IR Iran')
-        .replace('United States', 'USA')
-        .replace('South Korea', 'Korea Republic')
-        .replace('Republic of Korea', 'Korea Republic')
-        .replace('Ivory Coast', "Côte d'Ivoire")
-        .replace('Cape Verde', 'Cabo Verde')
-        .replace('Bosnia and Herzegovina', 'Bosnia & Herz.')
-        .replace('Bosnia-Herzegovina', 'Bosnia & Herz.')
-        .replace('DR Congo', 'Congo DR')
-        .replace('Turkey', 'Türkiye')
-        .replace('Curacao', 'Curaçao')
-      const key = `${normalize(f.teams.home.name)}|${normalize(f.teams.away.name)}`
-      fixtureByTeamsFlexible[key] = f
+    const apiByTeams = {}
+    for (const m of apiMatches) {
+      const key = `${normalize(m.homeTeam?.name)}|${normalize(m.awayTeam?.name)}`
+      apiByTeams[key] = m
     }
 
     let updated = 0
 
     for (const match of matches) {
-      // Find fixture by team names (our api_match_id is football-data.org format, not API-Football)
-      const teamKey = `${match.home_team}|${match.away_team}`
-      let fixture = fixtureByTeams[teamKey] || fixtureByTeamsFlexible[teamKey]
+      const key      = `${match.home_team}|${match.away_team}`
+      const apiMatch = apiByTeams[key]
 
-      // Log for debugging
-      if (!fixture) {
-        console.log(`[live-scores] No fixture found for: ${match.home_team} vs ${match.away_team}`)
-        console.log(`[live-scores] Available:`, Object.keys(fixtureByTeams).join(', '))
-      }
-
-      if (!fixture) {
-        // No live data found — if upcoming and past kickoff, mark live with 0-0
+      if (!apiMatch) {
+        // No data from API — if upcoming and past kickoff, mark live 0-0
         if (match.status === 'upcoming') {
           await supabaseAdmin.from('matches').update({
             status: 'live', home_goals: 0, away_goals: 0, match_period: `0'`
           }).eq('id', match.id)
           updated++
         }
+        console.log(`[live-scores] No API data for: ${match.home_team} vs ${match.away_team}`)
         continue
       }
 
-      const apiStatus  = fixture.fixture.status.short
-      const elapsed    = fixture.fixture.status.elapsed
-      const homeGoals  = fixture.goals.home  ?? 0
-      const awayGoals  = fixture.goals.away  ?? 0
-      const newStatus  = mapStatus(apiStatus)
-      const matchPeriod = mapPeriod(apiStatus, elapsed)
-
-      // Save API-Football fixture ID as a separate reference (don't overwrite football-data.org ID)
-      // We use team name matching so no ID needed
+      const isFinished = apiMatch.status === 'FINISHED'
+      const homeGoals  = isFinished
+        ? (apiMatch.score?.fullTime?.home ?? 0)
+        : (apiMatch.score?.fullTime?.home ?? apiMatch.score?.halfTime?.home ?? 0)
+      const awayGoals  = isFinished
+        ? (apiMatch.score?.fullTime?.away ?? 0)
+        : (apiMatch.score?.fullTime?.away ?? apiMatch.score?.halfTime?.away ?? 0)
+      const newStatus  = mapStatus(apiMatch.status)
+      const kickoffTime = new Date(match.kickoff_time)
+      const elapsedMins = Math.floor((now - kickoffTime) / 60000)
+      const matchPeriod = mapPeriod(apiMatch, elapsedMins)
 
       // Track goal times
-      const prevHome   = match.home_goals ?? 0
-      const prevAway   = match.away_goals ?? 0
-      let goalTimes    = []
+      const prevHome = match.home_goals ?? 0
+      const prevAway = match.away_goals ?? 0
+      let goalTimes  = []
       try {
         goalTimes = Array.isArray(match.goal_times)
           ? match.goal_times
           : JSON.parse(match.goal_times || '[]')
       } catch { goalTimes = [] }
 
-      // Get goal events from API for accurate goal minutes
-      const events = fixture.events || []
-      const goalEvents = events.filter(e => e.type === 'Goal' && e.detail !== 'Missed Penalty')
-      const homeGoalEvents = goalEvents.filter(e => e.team.id === fixture.teams.home.id)
-      const awayGoalEvents = goalEvents.filter(e => e.team.id === fixture.teams.away.id)
+      const homeGoalCount = goalTimes.filter(g => g.team === 'home').length
+      const awayGoalCount = goalTimes.filter(g => g.team === 'away').length
+      const mins = matchPeriod === 'HT' ? 45 : matchPeriod === 'FT' ? 90
+        : matchPeriod ? (parseInt(matchPeriod) || 0) : elapsedMins
 
-      // Rebuild goal times from API events (more accurate than estimated minutes)
-      if (goalEvents.length > 0 && goalEvents.length !== goalTimes.length) {
-        goalTimes = [
-          ...homeGoalEvents.map(e => ({ team: 'home', min: e.time.elapsed + (e.time.extra || 0), player: e.player?.name })),
-          ...awayGoalEvents.map(e => ({ team: 'away',  min: e.time.elapsed + (e.time.extra || 0), player: e.player?.name })),
-        ].sort((a, b) => a.min - b.min)
+      if (homeGoals > homeGoalCount) {
+        for (let i = 0; i < homeGoals - homeGoalCount; i++)
+          goalTimes.push({ team: 'home', min: mins })
+      }
+      if (awayGoals > awayGoalCount) {
+        for (let i = 0; i < awayGoals - awayGoalCount; i++)
+          goalTimes.push({ team: 'away', min: mins })
       }
 
       // Win probability
-      const totalMins = Math.min(elapsed || 0, 90)
-      const timeLeft  = Math.max(0, 90 - totalMins)
+      const totalMins = Math.min(elapsedMins, 90)
       const scoreDiff = homeGoals - awayGoals
       let homeWin, draw, awayWin
       if (newStatus === 'done') {
@@ -208,6 +179,7 @@ export async function GET() {
         draw    = homeGoals === awayGoals ? 100 : 0
         awayWin = awayGoals > homeGoals ? 100 : 0
       } else {
+        const timeLeft   = Math.max(0, 90 - totalMins)
         const scoreShift = scoreDiff * (15 + (90 - timeLeft) * 0.3)
         homeWin = Math.max(5, Math.min(90, 45 + scoreShift))
         awayWin = Math.max(5, Math.min(90, 30 - scoreShift))
@@ -218,7 +190,6 @@ export async function GET() {
         awayWin  = 100 - homeWin - draw
       }
 
-      // Update DB
       await supabaseAdmin.from('matches').update({
         home_goals:   homeGoals,
         away_goals:   awayGoals,
@@ -229,24 +200,23 @@ export async function GET() {
       }).eq('id', match.id)
 
       // Goal notification
-      if (homeGoals > prevHome || awayGoals > prevAway) {
-        const scoredTeam = homeGoals > prevHome
+      if (newStatus === 'live' && (homeGoals > prevHome || awayGoals > prevAway)) {
+        const scored = homeGoals > prevHome
           ? { team: match.home_team, flag: match.home_flag }
           : { team: match.away_team, flag: match.away_flag }
         await sendPush({
-          title:   `⚽ GOAL! ${scoredTeam.flag} ${scoredTeam.team}!`,
+          title:   `⚽ GOAL! ${scored.flag} ${scored.team}!`,
           message: `${match.home_flag} ${match.home_team} ${homeGoals}–${awayGoals} ${match.away_team} ${match.away_flag}`,
           url:     '/game?tab=predict',
         }).catch(() => {})
       }
 
-      // Settle predictions on full time
+      // Settle on full time
       if (newStatus === 'done') {
         const justFinished = match.status !== 'done'
         if (justFinished) {
           await settleMatch(match.id, homeGoals, awayGoals, match)
         } else {
-          // Re-settle if any predictions still have 0 points
           const { data: allPreds } = await supabaseAdmin
             .from('predictions').select('id,points_earned').eq('match_id', match.id)
           if (allPreds?.some(p => parseInt(p.points_earned, 10) === 0)) {
