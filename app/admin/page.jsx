@@ -80,11 +80,22 @@ export default function AdminPage() {
         : JSON.parse(match.goal_times || '[]')
     } catch {}
     setGoals(existingGoals)
+    // Parse existing period e.g. "67:23'" into min/sec
+    const parsePeriod = (p) => {
+      if (!p) return { min: '', sec: '' }
+      const m = p.match(/^(\d+):(\d+)'/)
+      if (m) return { min: m[1], sec: m[2] }
+      return { min: '', sec: '' }
+    }
+    const { min: pMin, sec: pSec } = parsePeriod(match.match_period)
+
     setForm({
       status:          match.status,
       home_goals:      match.home_goals ?? '',
       away_goals:      match.away_goals ?? '',
       match_period:    match.match_period ?? '',
+      period_min:      pMin,
+      period_sec:      pSec,
       manual_override: match.manual_override ?? false,
       kickoff_time:    match.kickoff_time
         ? match.kickoff_time.replace('+00', '').replace(' ', 'T').slice(0, 16)
@@ -302,13 +313,42 @@ export default function AdminPage() {
                   { label: '⏸ HT', value: 'HT', status: 'live' },
                   { label: '✓ FT', value: 'FT', status: 'done' },
                 ].map(p => (
-                  <button key={p.value} onClick={() => setForm(f => ({ ...f, match_period: p.value, status: p.status }))}
+                  <button key={p.value} onClick={() => { setForm(f => ({ ...f, match_period: p.value, status: p.status, period_min: '', period_sec: '' })) }}
                     style={{ padding: '6px 16px', borderRadius: 8, border: `1px solid ${form.match_period === p.value ? 'rgba(201,168,76,0.5)' : 'rgba(255,255,255,0.1)'}`, background: form.match_period === p.value ? 'rgba(201,168,76,0.15)' : 'transparent', color: form.match_period === p.value ? '#C9A84C' : 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{p.label}</button>
                 ))}
-                <input value={form.match_period} onChange={e => setForm(f => ({ ...f, match_period: e.target.value }))}
-                  placeholder="e.g. 67' or 90+'"
-                  style={{ flex: 1, padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 13, outline: 'none' }} />
               </div>
+              {/* Min : Sec input */}
+              {form.match_period !== 'HT' && form.match_period !== 'FT' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="number" min={0} max={120}
+                    placeholder="Min"
+                    value={form.period_min ?? ''}
+                    onChange={e => {
+                      const min = e.target.value
+                      const sec = form.period_sec ?? '00'
+                      const pad = (n) => String(parseInt(n)||0).padStart(2,'0')
+                      setForm(f => ({ ...f, period_min: min, match_period: min ? `${min}:${pad(sec)}'` : '' }))
+                    }}
+                    style={{ width: 70, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#C9A84C', fontSize: 18, fontWeight: 800, outline: 'none', textAlign: 'center' }}
+                  />
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 20, fontWeight: 700 }}>:</span>
+                  <input
+                    type="number" min={0} max={59}
+                    placeholder="Sec"
+                    value={form.period_sec ?? ''}
+                    onChange={e => {
+                      const sec = e.target.value
+                      const min = form.period_min ?? '0'
+                      const pad = (n) => String(parseInt(n)||0).padStart(2,'0')
+                      setForm(f => ({ ...f, period_sec: sec, match_period: min ? `${min}:${pad(sec)}'` : '' }))
+                    }}
+                    style={{ width: 70, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#C9A84C', fontSize: 18, fontWeight: 800, outline: 'none', textAlign: 'center' }}
+                  />
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 16 }}>'</span>
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, marginLeft: 4 }}>→ <span style={{ color: '#C9A84C' }}>{form.match_period || '—'}</span></span>
+                </div>
+              )}
             </div>
 
             {/* Kickoff time */}
