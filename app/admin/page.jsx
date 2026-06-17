@@ -298,9 +298,12 @@ export default function AdminPage() {
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>MATCH PERIOD</label>
               <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                {["HT","FT"].map(p => (
-                  <button key={p} onClick={() => setForm(f => ({ ...f, match_period: p }))}
-                    style={{ padding: '6px 16px', borderRadius: 8, border: `1px solid ${form.match_period === p ? 'rgba(201,168,76,0.5)' : 'rgba(255,255,255,0.1)'}`, background: form.match_period === p ? 'rgba(201,168,76,0.15)' : 'transparent', color: form.match_period === p ? '#C9A84C' : 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{p}</button>
+                {[
+                  { label: '⏸ HT', value: 'HT', status: 'live' },
+                  { label: '✓ FT', value: 'FT', status: 'done' },
+                ].map(p => (
+                  <button key={p.value} onClick={() => setForm(f => ({ ...f, match_period: p.value, status: p.status }))}
+                    style={{ padding: '6px 16px', borderRadius: 8, border: `1px solid ${form.match_period === p.value ? 'rgba(201,168,76,0.5)' : 'rgba(255,255,255,0.1)'}`, background: form.match_period === p.value ? 'rgba(201,168,76,0.15)' : 'transparent', color: form.match_period === p.value ? '#C9A84C' : 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{p.label}</button>
                 ))}
                 <input value={form.match_period} onChange={e => setForm(f => ({ ...f, match_period: e.target.value }))}
                   placeholder="e.g. 67' or 90+'"
