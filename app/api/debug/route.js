@@ -38,3 +38,4 @@ export async function GET() {
     dbLiveMatches: dbMatches || [],
   })
 }
+// cache bust Wed Jun 17 17:35:40 UTC 2026
