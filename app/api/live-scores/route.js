@@ -97,7 +97,7 @@ export async function GET() {
     const liveData = await apiFetch(`fixtures?league=${WC26_LEAGUE_ID}&season=${WC26_SEASON}&live=all`)
     const liveFixtures = liveData?.response || []
 
-    // Also fetch today's finished matches in case cron missed the live window
+    // Also fetch today's matches (live + finished) in case cron missed the live window
     const todayStr = now.toISOString().split('T')[0]
     const todayData = await apiFetch(`fixtures?league=${WC26_LEAGUE_ID}&season=${WC26_SEASON}&date=${todayStr}`)
     const todayFixtures = todayData?.response || []
@@ -110,27 +110,47 @@ export async function GET() {
       }
     }
 
-    // Build lookup by fixture ID
-    const fixtureById = {}
-    for (const f of allFixtures) fixtureById[f.fixture.id] = f
+    console.log(`[live-scores] API-Football returned ${allFixtures.length} fixtures for today`)
 
-    // Also build lookup by team names for matches without api_match_id
+    // Build lookup by team names (primary — our api_match_id is from football-data.org, not API-Football)
     const fixtureByTeams = {}
     for (const f of allFixtures) {
+      // Index by API-Football team names
       const key = `${f.teams.home.name}|${f.teams.away.name}`
       fixtureByTeams[key] = f
+    }
+
+    // Also build a flexible lookup that handles name differences
+    const fixtureByTeamsFlexible = {}
+    for (const f of allFixtures) {
+      // Normalize common name variants
+      const normalize = (n) => n
+        .replace('Iran', 'IR Iran')
+        .replace('United States', 'USA')
+        .replace('South Korea', 'Korea Republic')
+        .replace('Republic of Korea', 'Korea Republic')
+        .replace('Ivory Coast', "Côte d'Ivoire")
+        .replace('Cape Verde', 'Cabo Verde')
+        .replace('Bosnia and Herzegovina', 'Bosnia & Herz.')
+        .replace('Bosnia-Herzegovina', 'Bosnia & Herz.')
+        .replace('DR Congo', 'Congo DR')
+        .replace('Turkey', 'Türkiye')
+        .replace('Curacao', 'Curaçao')
+      const key = `${normalize(f.teams.home.name)}|${normalize(f.teams.away.name)}`
+      fixtureByTeamsFlexible[key] = f
     }
 
     let updated = 0
 
     for (const match of matches) {
-      // Find fixture in API data
-      let fixture = match.api_match_id ? fixtureById[parseInt(match.api_match_id)] : null
+      // Find fixture by team names (our api_match_id is football-data.org format, not API-Football)
+      const teamKey = `${match.home_team}|${match.away_team}`
+      let fixture = fixtureByTeams[teamKey] || fixtureByTeamsFlexible[teamKey]
 
-      // Fallback: try matching by team names
+      // Log for debugging
       if (!fixture) {
-        const key = `${match.home_team}|${match.away_team}`
-        fixture = fixtureByTeams[key]
+        console.log(`[live-scores] No fixture found for: ${match.home_team} vs ${match.away_team}`)
+        console.log(`[live-scores] Available:`, Object.keys(fixtureByTeams).join(', '))
       }
 
       if (!fixture) {
@@ -151,12 +171,8 @@ export async function GET() {
       const newStatus  = mapStatus(apiStatus)
       const matchPeriod = mapPeriod(apiStatus, elapsed)
 
-      // Save api_match_id if we found it via team name lookup
-      if (!match.api_match_id && fixture.fixture.id) {
-        await supabaseAdmin.from('matches')
-          .update({ api_match_id: fixture.fixture.id })
-          .eq('id', match.id)
-      }
+      // Save API-Football fixture ID as a separate reference (don't overwrite football-data.org ID)
+      // We use team name matching so no ID needed
 
       // Track goal times
       const prevHome   = match.home_goals ?? 0
