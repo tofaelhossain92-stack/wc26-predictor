@@ -124,8 +124,9 @@ function useLivePeriod(match) {
     const mins2       = 45 + Math.floor(secondHalfS / 60)
     const secs2       = secondHalfS % 60
     if (mins2 < 90) return `${mins2}:${pad(secs2)}'`
-    // Stoppage time
-    const extra    = mins2 - 90
+    // Stoppage time — cap at 90+10, after that assume FT
+    const extra = mins2 - 90
+    if (extra > 10) return 'FT'
     return `90+${extra > 0 ? extra : ''}:${pad(secs2)}'`
   }
 
@@ -150,7 +151,7 @@ function useLivePeriod(match) {
     setPeriod(calcFromKickoff())
 
     return () => clearInterval(interval)
-  }, [match.kickoff_time, match.status, match.match_period])
+  }, [match.kickoff_time, match.status, match.match_period]) // eslint-disable-line
 
   return period
 }
