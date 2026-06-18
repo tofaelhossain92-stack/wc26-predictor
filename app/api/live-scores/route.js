@@ -91,16 +91,14 @@ export async function GET() {
     // Get live + just-started matches from DB
     const { data: matches } = await supabaseAdmin
       .from('matches')
-      .select('*')
+      .select('id,home_team,away_team,status,kickoff_time,home_goals,away_goals,home_flag,away_flag,goal_times,win_prob,match_period,api_match_id,group_name')
       .or(`status.eq.live,and(status.eq.upcoming,kickoff_time.lte.${nowISO})`)
       .order('kickoff_time', { ascending: true })
 
     if (!matches?.length) return NextResponse.json({ ok: true, updated: 0 })
 
-    // Filter out manually overridden matches — admin has taken control
-    const autoMatches = matches.filter(m => !m.manual_override)
-    const skipped     = matches.length - autoMatches.length
-    if (!autoMatches.length) return NextResponse.json({ ok: true, updated: 0, skipped })
+    const autoMatches = matches
+    const skipped     = 0
 
     // Fetch today's matches from football-data.org
     const todayStr = now.toISOString().split('T')[0]
