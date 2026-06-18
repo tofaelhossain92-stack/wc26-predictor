@@ -100,12 +100,28 @@ export async function GET() {
     const autoMatches = matches
     const skipped     = 0
 
-    // Fetch today's matches from football-data.org
-    const todayStr = now.toISOString().split('T')[0]
-    const data = await fdFetch(`competitions/${WC_ID}/matches?dateFrom=${todayStr}&dateTo=${todayStr}`)
-    const apiMatches = data?.matches || []
+    // Fetch matches for today AND tomorrow (UTC) to catch late-night matches
+    // e.g. 10pm MDT = 4am UTC next day
+    const todayStr    = now.toISOString().split('T')[0]
+    const tomorrow    = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    const tomorrowStr = tomorrow.toISOString().split('T')[0]
+    const yesterday   = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    const yesterdayStr = yesterday.toISOString().split('T')[0]
 
-    console.log(`[live-scores] football-data.org returned ${apiMatches.length} matches for ${todayStr}`)
+    // Fetch a 3-day window to never miss a match near midnight UTC
+    const data = await fdFetch(`competitions/${WC_ID}/matches?dateFrom=${yesterdayStr}&dateTo=${tomorrowStr}`)
+    const allApiMatches = data?.matches || []
+
+    // Only keep matches that are IN_PLAY, PAUSED, FINISHED, or started within last 2 hours
+    const apiMatches = allApiMatches.filter(m => {
+      if (['IN_PLAY','PAUSED','FINISHED'].includes(m.status)) return true
+      // Also include matches that should have started (within 2hr window)
+      const kickoff = new Date(m.utcDate)
+      const minsAgo = (now - kickoff) / 60000
+      return minsAgo >= 0 && minsAgo <= 120
+    })
+
+    console.log(`[live-scores] football-data.org: ${allApiMatches.length} total, ${apiMatches.length} active/recent`)
 
     // Build lookup by team names (normalize common variants)
     const normalize = (n = '') => n
