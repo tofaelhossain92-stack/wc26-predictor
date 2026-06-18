@@ -88,18 +88,14 @@ export default function GameClient() {
     })
     if (!hasLive) return
 
-    // Trigger API sync + refresh display every 30s during live matches
-    const syncAndRefresh = async () => {
-      try {
-        // 1. Tell server to fetch latest from API-Football
-        await fetch('/api/live-scores', { cache: 'no-store' })
-      } catch {}
-      // 2. Pull fresh data from DB to update UI
+    // Only refresh UI from DB — never call live-scores from client
+    // live-scores is called by cron-job.org every 2 mins to avoid API rate limits
+    const refresh = async () => {
       await fetchMatches()
     }
 
-    syncAndRefresh() // run immediately
-    const interval = setInterval(syncAndRefresh, 30000) // then every 30s
+    refresh()
+    const interval = setInterval(refresh, 30000) // refresh UI every 30s
     return () => clearInterval(interval)
   }, [matches, fetchMatches])
 
