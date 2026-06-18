@@ -224,18 +224,9 @@ export async function GET() {
         }).catch(() => {})
       }
 
-      // Settle on full time
-      if (newStatus === 'done') {
-        const justFinished = match.status !== 'done'
-        if (justFinished) {
-          await settleMatch(match.id, homeGoals, awayGoals, match)
-        } else {
-          const { data: allPreds } = await supabaseAdmin
-            .from('predictions').select('id,points_earned').eq('match_id', match.id)
-          if (allPreds?.some(p => parseInt(p.points_earned, 10) === 0)) {
-            await settleMatch(match.id, homeGoals, awayGoals, match)
-          }
-        }
+      // Settle on full time — only when match JUST finished to avoid overwriting correct points
+      if (newStatus === 'done' && match.status !== 'done') {
+        await settleMatch(match.id, homeGoals, awayGoals, match)
       }
 
       updated++
