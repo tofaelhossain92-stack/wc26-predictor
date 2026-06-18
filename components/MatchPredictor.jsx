@@ -96,57 +96,61 @@ function parsePeriod(p) {
 }
 
 function useLivePeriod(match) {
-  const [period, setPeriod] = useState(match.match_period)
-  // Track the last synced period so we only reset ticker when DB gives us a newer time
-  const lastSyncedRef = useState(() => ({ period: match.match_period, ts: Date.now() }))[0]
+  const pad = (n) => String(n).padStart(2, '0')
+
+  // Calculate current time purely from kickoff — most reliable approach
+  // No dependency on stored match_period which can be stale
+  function calcFromKickoff() {
+    if (match.status !== 'live') return match.match_period
+    if (match.match_period === 'HT') return 'HT'
+    if (match.match_period === 'FT') return 'FT'
+
+    const kickoff   = new Date(match.kickoff_time)
+    const elapsedMs = Date.now() - kickoff.getTime()
+    const elapsedS  = Math.floor(elapsedMs / 1000)
+
+    // First half: 0–47 mins (allow 2 min stoppage)
+    if (elapsedS < 47 * 60) {
+      const mins = Math.min(Math.floor(elapsedS / 60), 45)
+      const secs = elapsedS % 60
+      return `${mins}:${pad(secs)}'`
+    }
+    // Half time window: 47–62 mins elapsed (15 min break)
+    if (elapsedS < 62 * 60) {
+      return 'HT'
+    }
+    // Second half: offset by 62 mins (45 play + 17 break)
+    const secondHalfS = elapsedS - 62 * 60
+    const mins2       = 45 + Math.floor(secondHalfS / 60)
+    const secs2       = secondHalfS % 60
+    if (mins2 < 90) return `${mins2}:${pad(secs2)}'`
+    // Stoppage time
+    const extra    = mins2 - 90
+    return `90+${extra > 0 ? extra : ''}:${pad(secs2)}'`
+  }
+
+  const [period, setPeriod] = useState(calcFromKickoff)
 
   useEffect(() => {
-    if (match.status !== 'live') { setPeriod(match.match_period); return }
-    if (match.match_period === 'HT' || match.match_period === 'FT') { setPeriod(match.match_period); return }
-
-    const parsed = parsePeriod(match.match_period)
-    if (!parsed) { setPeriod(match.match_period || 'LIVE'); return }
-
-    const pad = (n) => String(n).padStart(2, '0')
-
-    // Calculate how many seconds have elapsed since DB was last written
-    // so we start the ticker from the correct current time
-    const secondsSinceSync = Math.floor((Date.now() - lastSyncedRef.ts) / 1000)
-    let totalSecs = parsed.mins * 60 + parsed.secs + secondsSinceSync
-    let mins = Math.floor(totalSecs / 60)
-    let secs = totalSecs % 60
-
-    // Update sync reference
-    lastSyncedRef.period = match.match_period
-    lastSyncedRef.ts     = Date.now()
-
-    const tick = () => {
-      secs++
-      if (secs >= 60) { secs = 0; mins++ }
-      // Cap at 90+
-      if (!parsed.plus && mins >= 90) {
-        const extraSecs = (mins - 90) * 60 + secs
-        const extraMins = Math.floor(extraSecs / 60)
-        const remSecs   = extraSecs % 60
-        setPeriod(`90+${extraMins > 0 ? extraMins : ''}:${pad(remSecs)}'`)
-      } else {
-        setPeriod(parsed.plus ? `${parsed.baseMins}+:${pad(secs)}'` : `${mins}:${pad(secs)}'`)
-      }
+    if (match.status !== 'live') {
+      setPeriod(match.match_period)
+      return
+    }
+    if (match.match_period === 'HT' || match.match_period === 'FT') {
+      setPeriod(match.match_period)
+      return
     }
 
-    // Set initial display immediately
-    if (!parsed.plus && mins >= 90) {
-      const extraSecs = (mins - 90) * 60 + secs
-      const extraMins = Math.floor(extraSecs / 60)
-      const remSecs   = extraSecs % 60
-      setPeriod(`90+${extraMins > 0 ? extraMins : ''}:${pad(remSecs)}'`)
-    } else {
-      setPeriod(parsed.plus ? `${parsed.baseMins}+:${pad(secs)}'` : `${mins}:${pad(secs)}'`)
-    }
+    // Tick every second, always calculating from kickoff time
+    const interval = setInterval(() => {
+      setPeriod(calcFromKickoff())
+    }, 1000)
 
-    const interval = setInterval(tick, 1000)
+    // Set immediately
+    setPeriod(calcFromKickoff())
+
     return () => clearInterval(interval)
-  }, [match.match_period, match.status]) // eslint-disable-line
+  }, [match.kickoff_time, match.status, match.match_period])
 
   return period
 }
