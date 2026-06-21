@@ -3,25 +3,19 @@ import { useState, useRef, useEffect } from 'react'
 
 // ── FIFA Rankings (March 2026) ─────────────────────────────────────────────
 const FIFA_RANKINGS = {
-  'Argentina':      1,  'Spain':          2,  'France':         3,
-  'England':        4,  'Brazil':         5,  'Portugal':       6,
-  'Netherlands':    7,  'Belgium':        8,  'Germany':        9,
-  'Uruguay':        10, 'Colombia':       11, 'Morocco':        12,
-  'Italy':          13, 'USA':            14, 'Mexico':         15,
-  'Japan':          16, 'Ecuador':        17, 'Croatia':        18,
-  'Senegal':        19, 'Switzerland':    20, 'Denmark':        21,
-  'Korea Republic': 22, 'Austria':        23, 'Australia':      24,
-  'Türkiye':        25, 'IR Iran':        26, 'Norway':         27,
-  'Ukraine':        28, 'Hungary':        29, 'Scotland':       30,
-  'Poland':         31, 'Serbia':         32, 'Qatar':          33,
-  'Czechia':        34, 'Algeria':        35, 'Paraguay':       36,
-  'Sweden':         37, 'Ghana':          38, 'Saudi Arabia':   39,
-  'Cabo Verde':     40, 'Canada':         41, 'Tunisia':        42,
-  'South Africa':   43, 'Iraq':           44, 'Panama':         45,
-  'Uzbekistan':     46, 'Jordan':         47, 'Curaçao':        48,
-  'New Zealand':    49, "Côte d'Ivoire": 50, 'Egypt':          51,
-  'Bosnia & Herz.': 52, 'Congo DR':       53, 'Haiti':          54,
-  'Guatemala':      55, 'Bolivia':        56,
+  'Argentina': 1, 'Spain': 2, 'France': 3, 'England': 4, 'Portugal': 5,
+  'Brazil': 6, 'Morocco': 7, 'Netherlands': 8, 'Belgium': 9, 'Germany': 10,
+  'Croatia': 11, 'Italy': 12, 'Colombia': 13, 'Mexico': 14, 'Senegal': 15,
+  'Uruguay': 16, 'USA': 17, 'Japan': 18, 'Switzerland': 19, 'IR Iran': 20,
+  'Denmark': 21, 'Türkiye': 22, 'Ecuador': 23, 'Austria': 24, 'Korea Republic': 25,
+  'Nigeria': 26, 'Australia': 27, 'Algeria': 28, 'Egypt': 29, 'Canada': 30,
+  'Norway': 31, 'Ukraine': 32, "Côte d'Ivoire": 33, 'Panama': 34, 'Russia': 35,
+  'Poland': 36, 'Wales': 37, 'Sweden': 38, 'Hungary': 39, 'Czechia': 40,
+  'Paraguay': 41, 'Scotland': 42, 'Serbia': 43, 'Cameroon': 44, 'Tunisia': 45,
+  'Congo DR': 46, 'Slovakia': 47, 'Greece': 48, 'Venezuela': 49, 'Uzbekistan': 50,
+  'Qatar': 56, 'Iraq': 57, 'South Africa': 60, 'Saudi Arabia': 61, 'Jordan': 63,
+  'Bosnia & Herz.': 64, 'Cabo Verde': 67, 'Ghana': 73, 'Curaçao': 82,
+  'Haiti': 83, 'New Zealand': 85,
 }
 
 function safeParseJSON(val) {
