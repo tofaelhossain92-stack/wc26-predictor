@@ -103,11 +103,15 @@ function useLivePeriod(match) {
     const elapsedMs = Date.now() - kickoff.getTime()
     const elapsedS  = Math.floor(elapsedMs / 1000)
 
-    // First half: 0–47 mins (allow 2 min stoppage)
+    // First half: 0–45 mins normal time, then stoppage shows seconds
+    if (elapsedS < 45 * 60) {
+      const mins = Math.floor(elapsedS / 60)
+      return `${mins}'`
+    }
     if (elapsedS < 47 * 60) {
-      const mins = Math.min(Math.floor(elapsedS / 60), 45)
-      const secs = elapsedS % 60
-      return `${mins}:${pad(secs)}'`
+      // Stoppage time in 1st half — show seconds
+      const stoppageS = elapsedS - 45 * 60
+      return `45+:${pad(stoppageS % 60)}'`
     }
     // Half time window: 47–62 mins elapsed (15 min break)
     if (elapsedS < 62 * 60) {
@@ -116,12 +120,12 @@ function useLivePeriod(match) {
     // Second half: offset by 62 mins (45 play + 17 break)
     const secondHalfS = elapsedS - 62 * 60
     const mins2       = 45 + Math.floor(secondHalfS / 60)
-    const secs2       = secondHalfS % 60
-    if (mins2 < 90) return `${mins2}:${pad(secs2)}'`
-    // Stoppage time — cap at 90+10, after that assume FT
-    const extra = mins2 - 90
-    if (extra > 10) return 'FT'
-    return `90+${extra > 0 ? extra : ''}:${pad(secs2)}'`
+    if (mins2 < 90) return `${mins2}'`
+    // Stoppage time — show seconds, cap at 90+10
+    const extraS = secondHalfS - 45 * 60
+    const extraMins = Math.floor(extraS / 60)
+    if (extraMins > 10) return 'FT'
+    return `90+${extraMins > 0 ? extraMins : ''}:${pad(extraS % 60)}'`
   }
 
   const [period, setPeriod] = useState(calcFromKickoff)
