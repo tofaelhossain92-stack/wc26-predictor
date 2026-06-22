@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { calcStandings, GROUP_TEAMS } from '@/lib/standings'
 
 const VALID_GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L']
 const KNOCKOUT_GROUPS = ['R32','R16','QF','SF','3RD','FINAL']
@@ -45,25 +46,34 @@ function StandingsTable({ group, teams }) {
         <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9, fontWeight: 700, textAlign: 'center', letterSpacing: 0.5 }}>PTS</div>
       </div>
 
-      {sorted.map((team, i) => (
-        <div key={team.name} style={{
-          display: 'grid', gridTemplateColumns: '1fr 28px 28px 28px 28px 36px',
-          gap: 4, padding: '10px 12px', alignItems: 'center',
-          borderBottom: i < sorted.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-          borderLeft: i < 2 ? '3px solid #00c896' : '3px solid transparent',
-          background: i < 2 ? 'rgba(0,200,150,0.03)' : 'transparent',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-            <span style={{ color: i < 2 ? '#00c896' : 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700, minWidth: 12 }}>{i + 1}</span>
-            <span style={{ fontSize: 14, flexShrink: 0 }}>{team.flag}</span>
-            <span style={{ color: '#fff', fontSize: 12, fontWeight: i < 2 ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{team.name}</span>
+      {sorted.map((team, i) => {
+        const allPlayed = sorted.every(t => t.mp >= 3)
+        const qualified = allPlayed && i < 2
+        return (
+          <div key={team.name} style={{
+            display: 'grid', gridTemplateColumns: '1fr 28px 28px 28px 28px 36px',
+            gap: 4, padding: '10px 12px', alignItems: 'center',
+            borderBottom: i < sorted.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+            borderLeft: i < 2 ? '3px solid #00c896' : '3px solid transparent',
+            background: i < 2 ? 'rgba(0,200,150,0.03)' : 'transparent',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+              <span style={{ color: i < 2 ? '#00c896' : 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700, minWidth: 12 }}>{i + 1}</span>
+              <span style={{ fontSize: 14, flexShrink: 0 }}>{team.flag}</span>
+              <span style={{ color: '#fff', fontSize: 12, fontWeight: i < 2 ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{team.name}</span>
+              {qualified && (
+                <span style={{ fontSize: 8, fontWeight: 800, color: '#00c896', background: 'rgba(0,200,150,0.15)', border: '1px solid rgba(0,200,150,0.4)', borderRadius: 6, padding: '1px 5px', flexShrink: 0, letterSpacing: 0.5 }}>
+                  Q
+                </span>
+              )}
+            </div>
+            {[team.mp, team.w, team.d, team.l].map((val, j) => (
+              <div key={j} style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textAlign: 'center' }}>{val}</div>
+            ))}
+            <div style={{ color: i < 2 ? '#C9A84C' : '#fff', fontSize: 13, fontWeight: 800, textAlign: 'center' }}>{team.pts}</div>
           </div>
-          {[team.mp, team.w, team.d, team.l].map((val, j) => (
-            <div key={j} style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textAlign: 'center' }}>{val}</div>
-          ))}
-          <div style={{ color: i < 2 ? '#C9A84C' : '#fff', fontSize: 13, fontWeight: 800, textAlign: 'center' }}>{team.pts}</div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -97,6 +107,13 @@ function KnockoutCard({ match }) {
 
 export default function Standings({ matches }) {
   const [tab, setTab] = useState('group')
+  const [favTeam, setFavTeam] = useState(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setFavTeam(localStorage.getItem('wc26_fav_team') || null)
+    }
+  }, [])
 
   // ── Build group stage standings ──────────────────────────────────────────
   const teamMap = {}
@@ -159,7 +176,15 @@ export default function Standings({ matches }) {
     }
   })
 
-  const groupLetters = Object.keys(groups).sort()
+  let groupLetters = Object.keys(groups).sort()
+
+  // Move favourite team's group to the front
+  if (favTeam) {
+    const favGroup = Object.keys(GROUP_TEAMS).find(g => GROUP_TEAMS[g].includes(favTeam))
+    if (favGroup && groupLetters.includes(favGroup)) {
+      groupLetters = [favGroup, ...groupLetters.filter(g => g !== favGroup)]
+    }
+  }
 
   // ── Build knockout stage matches ─────────────────────────────────────────
   const knockoutByStage = {}

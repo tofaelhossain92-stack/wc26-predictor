@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
+import { calcStandings } from '@/lib/standings'
 
 // ── FIFA Rankings (March 2026) ─────────────────────────────────────────────
 const FIFA_RANKINGS = {
@@ -295,10 +296,20 @@ function MatchCard({ match, prediction, onPredict }) {
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.home_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{match.home_team}</div>
           {FIFA_RANKINGS[match.home_team] ? (
-            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 10 }}>
+            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 4 }}>
               FIFA #{FIFA_RANKINGS[match.home_team]}
             </div>
-          ) : <div style={{ marginBottom: 12 }} />}
+          ) : <div style={{ marginBottom: 4 }} />}
+          {match.homePos ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: match.homePos.position <= 2 ? '#00c896' : 'rgba(255,255,255,0.35)' }}>
+                Grp {match.homePos.group} · #{match.homePos.position} · {match.homePos.pts}pts
+              </span>
+              {match.homePos.qualified && (
+                <span style={{ fontSize: 8, fontWeight: 800, color: '#00c896', background: 'rgba(0,200,150,0.15)', border: '1px solid rgba(0,200,150,0.4)', borderRadius: 6, padding: '1px 5px' }}>Q</span>
+              )}
+            </div>
+          ) : <div style={{ marginBottom: 10 }} />}
           {(saved || locked) && homeG !== '' ? (
             <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {homeG}
@@ -362,10 +373,20 @@ function MatchCard({ match, prediction, onPredict }) {
           <div style={{ fontSize: 52, marginBottom: 10, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>{match.away_flag}</div>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{match.away_team}</div>
           {FIFA_RANKINGS[match.away_team] ? (
-            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 10 }}>
+            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 600, marginBottom: 4 }}>
               FIFA #{FIFA_RANKINGS[match.away_team]}
             </div>
-          ) : <div style={{ marginBottom: 12 }} />}
+          ) : <div style={{ marginBottom: 4 }} />}
+          {match.awayPos ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: match.awayPos.position <= 2 ? '#00c896' : 'rgba(255,255,255,0.35)' }}>
+                Grp {match.awayPos.group} · #{match.awayPos.position} · {match.awayPos.pts}pts
+              </span>
+              {match.awayPos.qualified && (
+                <span style={{ fontSize: 8, fontWeight: 800, color: '#00c896', background: 'rgba(0,200,150,0.15)', border: '1px solid rgba(0,200,150,0.4)', borderRadius: 6, padding: '1px 5px' }}>Q</span>
+              )}
+            </div>
+          ) : <div style={{ marginBottom: 10 }} />}
           {(saved || locked) && awayG !== '' ? (
             <div style={{ width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 900, color: '#C9A84C', background: 'rgba(201,168,76,0.06)', borderRadius: 16, border: '2px solid rgba(201,168,76,0.2)' }}>
               {awayG}
@@ -518,6 +539,9 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
     myData.predictions.forEach(p => { myPredMap[p.matchId] = p })
   }
 
+  // Group stage standings — used to show position/qualified badge beside team names
+  const { teamPosition } = calcStandings(matches)
+
   const dates    = ['All', ...new Set(
     matches.filter(m => m.kickoff_time && m.kickoff_time).map(m => new Date(m.kickoff_time).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }))
   )]
@@ -602,7 +626,9 @@ export default function MatchPredictor({ matches, user, leaderboard, onPredicted
             form: {
               home: formData[match.home_team] || [],
               away: formData[match.away_team] || [],
-            }
+            },
+            homePos: teamPosition[match.home_team],
+            awayPos: teamPosition[match.away_team],
           }}
           prediction={myPredMap[match.id]}
           onPredict={{ userId: user.id, refresh: onPredicted }}
