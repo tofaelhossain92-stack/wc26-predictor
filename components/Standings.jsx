@@ -37,19 +37,18 @@ function StandingsTable({ group, teams }) {
         <span style={{ background: 'rgba(74,158,255,0.2)', color: '#4a9eff', border: '1px solid rgba(74,158,255,0.3)', borderRadius: 20, padding: '2px 10px', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>GROUP {group}</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 26px 26px 26px 26px 26px 26px 26px 32px 110px', gap: 2, padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 28px 28px 28px 28px 36px', gap: 4, padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>TEAM</div>
-        {['MP','W','D','L','GF','GA','GD'].map(h => (
+        {['MP','W','D','L'].map(h => (
           <div key={h} style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9, fontWeight: 700, textAlign: 'center', letterSpacing: 0.5 }}>{h}</div>
         ))}
         <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9, fontWeight: 700, textAlign: 'center', letterSpacing: 0.5 }}>PTS</div>
-        <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 9, fontWeight: 700, textAlign: 'right', letterSpacing: 0.5 }}>LAST 5</div>
       </div>
 
       {sorted.map((team, i) => (
         <div key={team.name} style={{
-          display: 'grid', gridTemplateColumns: '1fr 26px 26px 26px 26px 26px 26px 26px 32px 110px',
-          gap: 2, padding: '10px 12px', alignItems: 'center',
+          display: 'grid', gridTemplateColumns: '1fr 28px 28px 28px 28px 36px',
+          gap: 4, padding: '10px 12px', alignItems: 'center',
           borderBottom: i < sorted.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
           borderLeft: i < 2 ? '3px solid #00c896' : '3px solid transparent',
           background: i < 2 ? 'rgba(0,200,150,0.03)' : 'transparent',
@@ -59,14 +58,10 @@ function StandingsTable({ group, teams }) {
             <span style={{ fontSize: 14, flexShrink: 0 }}>{team.flag}</span>
             <span style={{ color: '#fff', fontSize: 12, fontWeight: i < 2 ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{team.name}</span>
           </div>
-          {[team.mp, team.w, team.d, team.l, team.gf, team.ga].map((val, j) => (
+          {[team.mp, team.w, team.d, team.l].map((val, j) => (
             <div key={j} style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textAlign: 'center' }}>{val}</div>
           ))}
-          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, textAlign: 'center' }}>{team.gd > 0 ? `+${team.gd}` : team.gd}</div>
           <div style={{ color: i < 2 ? '#C9A84C' : '#fff', fontSize: 13, fontWeight: 800, textAlign: 'center' }}>{team.pts}</div>
-          <div style={{ display: 'flex', gap: 3, justifyContent: 'flex-end' }}>
-            {[0,1,2,3,4].map(idx => <FormDot key={idx} result={team.last5[idx]} />)}
-          </div>
         </div>
       ))}
     </div>
@@ -199,13 +194,8 @@ export default function Standings({ matches }) {
           <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', padding: '40px 0' }}>No group stage results yet</div>
         ) : (
           <>
-            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 8, height: 3, borderRadius: 2, background: '#00c896', display: 'inline-block' }} /> Qualification line
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><FormDot result="W" /> Win</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><FormDot result="D" /> Draw</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><FormDot result="L" /> Loss</span>
+            <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 3, borderRadius: 2, background: '#00c896', display: 'inline-block' }} /> Qualification line
             </div>
             {groupLetters.map(g => <StandingsTable key={g} group={g} teams={groups[g]} />)}
           </>
