@@ -133,11 +133,18 @@ export default function AdminPage() {
     }
     setMessage({ type: 'success', text: data.message })
     console.log('Bracket suggestions:', data)
-    alert(
-      'Group Winners:\n' + Object.entries(data.winners).map(([g,t]) => `${g}: ${t.flag} ${t.name}`).join('\n') +
-      '\n\nRunners-up:\n' + Object.entries(data.runnersUp).map(([g,t]) => `${g}: ${t.flag} ${t.name}`).join('\n') +
-      '\n\nBest 8 Third-Placed:\n' + data.best8Third.map(t => `${t.group}: ${t.flag} ${t.name} (${t.pts}pts)`).join('\n')
-    )
+    const lines = [
+      'Best 8 Third-Placed Teams (qualified):',
+      ...data.qualifyingThirds.map(t => `  Group ${t.group}: ${t.flag} ${t.name} (${t.pts}pts, GD ${t.gd})`),
+      '',
+      'Round of 32 Matches (Match # — Home vs Away):',
+      ...data.resolvedMatches.map(m =>
+        `  M${m.match}: ${m.home ? `${m.home.flag} ${m.home.name}` : '⚠️ UNRESOLVED'} vs ${m.away ? `${m.away.flag} ${m.away.name}` : '⚠️ UNRESOLVED'}`
+      ),
+      '',
+      '⚠️ Double-check 3rd-place pairings against FIFA\'s official combination table before applying — this pool-based resolver is a best-effort match, not the exact published combo.',
+    ]
+    alert(lines.join('\n'))
   }
 
   const statusColor = { live: '#C8102E', done: '#C9A84C', upcoming: '#4a9eff' }
