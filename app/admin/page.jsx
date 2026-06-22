@@ -119,6 +119,17 @@ export default function AdminPage() {
     setMessage({ type: 'success', text: `✅ Points recalculated — ${data.matches_settled} matches settled` })
   }
 
+  async function toggleChatbot() {
+    setMessage({ type: 'info', text: '🔄 Toggling chatbot...' })
+    const res = await fetch('/api/admin/toggle-chatbot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: ADMIN_PASSWORD }),
+    })
+    const data = await res.json()
+    setMessage({ type: 'success', text: data.enabled ? '✅ Chatbot enabled' : '⛔ Chatbot disabled' })
+  }
+
   async function checkBracket() {
     setMessage({ type: 'info', text: '🔍 Checking group standings...' })
     const res = await fetch('/api/admin/auto-fill-bracket', {
@@ -200,6 +211,7 @@ export default function AdminPage() {
             <button onClick={triggerLiveSync} style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(74,158,255,0.4)', background: 'rgba(74,158,255,0.1)', color: '#4a9eff', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>🔄 Sync Scores</button>
             <button onClick={triggerSettle}   style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(201,168,76,0.4)', background: 'rgba(201,168,76,0.1)', color: '#C9A84C', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>🏆 Recalc Points</button>
             <button onClick={checkBracket}   style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(0,200,150,0.4)', background: 'rgba(0,200,150,0.1)', color: '#00c896', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>🎯 Check Bracket</button>
+            <button onClick={toggleChatbot}  style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>💬 Toggle Chatbot</button>
             <button onClick={fetchMatches}    style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>↻ Refresh</button>
           </div>
         </div>

@@ -8,6 +8,7 @@ import Leaderboard   from '@/components/Leaderboard'
 import TrashTalk     from '@/components/TrashTalk'
 import Standings     from '@/components/Standings'
 import Profile      from '@/components/Profile'
+import ChatBot      from '@/components/ChatBot'
 
 const TABS = [
   { id: 'predict',     label: 'Predict',     icon: '⚽' },
@@ -226,6 +227,8 @@ export default function GameClient() {
         ))}
         </div>
       </div>
+
+      <ChatBot />
     </div>
   )
 }
