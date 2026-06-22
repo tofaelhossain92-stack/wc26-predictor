@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 export default function ChatBot() {
   const [open, setOpen]       = useState(false)
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hey! I'm Kicktionary 📊 — ask me anything about matches, standings, or the leaderboard!" }
+    { role: 'assistant', content: "Hey! I'm Kicktionary ⚽ — ask me anything about matches, standings, or the leaderboard!" }
   ])
   const [input, setInput]     = useState('')
   const [loading, setLoading] = useState(false)
@@ -64,7 +64,7 @@ export default function ChatBot() {
           }}
           aria-label="Open Kicktionary chatbot"
         >
-          📊
+          ⚽
         </button>
       )}
 
@@ -87,7 +87,7 @@ export default function ChatBot() {
             {/* Header */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
-                📊 Kicktionary
+                ⚽ Kicktionary
               </div>
               <button onClick={() => setOpen(false)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.6)', width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
