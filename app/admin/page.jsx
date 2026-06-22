@@ -156,6 +156,15 @@ export default function AdminPage() {
     return acc
   }, {})
 
+  const todayLabel = new Date().toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' })
+  const dateEntries = Object.entries(groupedByDate)
+  // Put today's group first, keep the rest in their original (chronological) order
+  dateEntries.sort((a, b) => {
+    if (a[0] === todayLabel) return -1
+    if (b[0] === todayLabel) return 1
+    return 0
+  })
+
   const inputStyle = { width: '100%', padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box' }
   const labelStyle = { color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 700, letterSpacing: 1, display: 'block', marginBottom: 6 }
 
@@ -206,9 +215,16 @@ export default function AdminPage() {
         {loading ? (
           <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', padding: 40 }}>Loading...</div>
         ) : (
-          Object.entries(groupedByDate).map(([date, dayMatches]) => (
+          dateEntries.map(([date, dayMatches]) => (
             <div key={date} style={{ marginBottom: 24 }}>
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' }}>{date}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <div style={{ color: date === todayLabel ? '#C9A84C' : 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase' }}>{date}</div>
+                {date === todayLabel && (
+                  <span style={{ fontSize: 9, fontWeight: 800, color: '#C9A84C', background: 'rgba(201,168,76,0.15)', border: '1px solid rgba(201,168,76,0.4)', borderRadius: 6, padding: '2px 6px', letterSpacing: 1 }}>
+                    TODAY
+                  </span>
+                )}
+              </div>
               {dayMatches.map(match => {
                 let goalList = []
                 try { goalList = Array.isArray(match.goal_times) ? match.goal_times : JSON.parse(match.goal_times || '[]') } catch {}
