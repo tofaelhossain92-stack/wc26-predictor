@@ -47,7 +47,7 @@ export async function POST(req) {
   // Build a compact text summary of relevant data for Claude's context
   const upcomingMatches = (matches || [])
     .filter(m => m.status === 'upcoming' && m.kickoff_time > now)
-    .slice(0, 15)
+    .slice(0, 60)
     .map(m => `${m.home_team} vs ${m.away_team} — ${new Date(m.kickoff_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} (Group ${m.group_name})`)
     .join('\n')
 
@@ -58,7 +58,7 @@ export async function POST(req) {
 
   const recentResults = (matches || [])
     .filter(m => m.status === 'done')
-    .slice(-15)
+    .slice(-40)
     .map(m => `${m.home_team} ${m.home_goals}-${m.away_goals} ${m.away_team} (Group ${m.group_name})`)
     .join('\n')
 
@@ -70,17 +70,17 @@ export async function POST(req) {
     .map((u, i) => `${i+1}. ${u.name} — ${u.points}pts`)
     .join('\n')
 
-  const systemPrompt = `You are a friendly stats assistant for "WC26 Predictor" — a World Cup 2026 prediction app used by a small group of friends. Answer questions about matches, standings, and the leaderboard using ONLY the data provided below. Be concise and conversational — 1-3 sentences usually. If asked something not covered by this data (e.g. real-world news, opinions, predictions about future results), politely say you only know app data and can't help with that. Never make up scores, dates, or standings that aren't in the data below.
+  const systemPrompt = `You are a friendly stats assistant for "WC26 Predictor" — a World Cup 2026 prediction app used by a small group of friends. Answer questions about matches, standings, and the leaderboard using ONLY the data provided below. Be concise and conversational — 1-3 sentences usually. If asked something not covered by this data (e.g. real-world news, opinions, predictions about future results), politely say you only know app data and can't help with that. Never make up scores, dates, or standings that aren't in the data below. If a team you're asked about doesn't appear in the upcoming matches list, say you don't see it in the schedule data rather than concluding they've finished their group stage — the list may simply not include every fixture.
 
 CURRENT DATE/TIME: ${new Date().toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}
 
 LIVE MATCHES:
 ${liveMatches}
 
-UPCOMING MATCHES (next 15):
+UPCOMING MATCHES (all remaining fixtures):
 ${upcomingMatches || 'None scheduled'}
 
-RECENT RESULTS (last 15):
+RECENT RESULTS (last 40):
 ${recentResults || 'None yet'}
 
 GROUP STANDINGS:
