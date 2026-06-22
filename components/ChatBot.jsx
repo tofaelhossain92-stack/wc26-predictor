@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 export default function ChatBot() {
   const [open, setOpen]       = useState(false)
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hey! Ask me anything about matches, standings, or the leaderboard ⚽" }
+    { role: 'assistant', content: "Hey! I'm Kicktionary 📊 — ask me anything about matches, standings, or the leaderboard!" }
   ])
   const [input, setInput]     = useState('')
   const [loading, setLoading] = useState(false)
@@ -57,14 +57,14 @@ export default function ChatBot() {
           style={{
             position: 'fixed', bottom: 84, right: 16, zIndex: 998,
             width: 56, height: 56, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #C9A84C, #a8832a)',
-            border: 'none', boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
+            background: 'linear-gradient(135deg, #4a9eff, #2b6fd1)',
+            border: 'none', boxShadow: '0 4px 16px rgba(74,158,255,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 24, cursor: 'pointer',
           }}
-          aria-label="Open stats chatbot"
+          aria-label="Open Kicktionary chatbot"
         >
-          💬
+          📊
         </button>
       )}
 
@@ -87,7 +87,7 @@ export default function ChatBot() {
             {/* Header */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
-                💬 Stats Bot
+                📊 Kicktionary
               </div>
               <button onClick={() => setOpen(false)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.6)', width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
@@ -101,8 +101,8 @@ export default function ChatBot() {
                 }}>
                   <div style={{
                     maxWidth: '80%', padding: '10px 14px', borderRadius: 14,
-                    background: m.role === 'user' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.06)',
-                    border: m.role === 'user' ? '1px solid rgba(201,168,76,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                    background: m.role === 'user' ? 'rgba(74,158,255,0.2)' : 'rgba(255,255,255,0.06)',
+                    border: m.role === 'user' ? '1px solid rgba(74,158,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
                     color: '#fff', fontSize: 13, lineHeight: 1.5,
                   }}>
                     {m.content}
@@ -136,8 +136,8 @@ export default function ChatBot() {
                 disabled={loading || !input.trim()}
                 style={{
                   padding: '10px 18px', borderRadius: 12, border: 'none',
-                  background: loading || !input.trim() ? 'rgba(201,168,76,0.3)' : 'linear-gradient(135deg,#C9A84C,#a8832a)',
-                  color: '#0a0f1e', fontWeight: 700, fontSize: 14, cursor: loading || !input.trim() ? 'default' : 'pointer',
+                  background: loading || !input.trim() ? 'rgba(74,158,255,0.3)' : 'linear-gradient(135deg,#4a9eff,#2b6fd1)',
+                  color: '#fff', fontWeight: 700, fontSize: 14, cursor: loading || !input.trim() ? 'default' : 'pointer',
                 }}
               >
                 →
