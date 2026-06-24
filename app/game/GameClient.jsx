@@ -96,23 +96,33 @@ export default function GameClient() {
     }
 
     refresh()
-    const interval = setInterval(refresh, 30000) // refresh UI every 30s
+    const interval = setInterval(refresh, 90000) // safety-net refresh every 90s (realtime covers most updates)
     return () => clearInterval(interval)
   }, [matches, fetchMatches])
 
   // Realtime subscriptions
   useEffect(() => {
+    let matchDebounce, userDebounce
+
     const matchSub = supabase
       .channel('matches-channel')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, () => fetchMatches())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, () => {
+        clearTimeout(matchDebounce)
+        matchDebounce = setTimeout(() => fetchMatches(), 2000) // wait 2s, collapse rapid-fire updates
+      })
       .subscribe()
 
     const userSub = supabase
       .channel('users-channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => fetchLeaderboard())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
+        clearTimeout(userDebounce)
+        userDebounce = setTimeout(() => fetchLeaderboard(), 2000)
+      })
       .subscribe()
 
     return () => {
+      clearTimeout(matchDebounce)
+      clearTimeout(userDebounce)
       supabase.removeChannel(matchSub)
       supabase.removeChannel(userSub)
     }
