@@ -23,8 +23,8 @@ export async function GET() {
     // Fetch all users sorted by points
     const users = await sbGet('users?select=id,name,avatar,points,created_at&order=points.desc')
 
-    // Fetch all predictions with match details
-    const predictions = await sbGet('predictions?select=id,user_id,home_goals,away_goals,points_earned,submitted_at,match:matches(id,group_name,home_team,away_team,home_flag,away_flag,kickoff_time,status,home_goals,away_goals)&order=submitted_at.desc')
+    // Fetch all predictions with minimal match details (only fields actually used)
+    const predictions = await sbGet('predictions?select=id,user_id,home_goals,away_goals,points_earned,submitted_at,match:matches(id,group_name,home_team,away_team,home_flag,away_flag,status,home_goals,away_goals)&order=submitted_at.desc')
 
     // Attach predictions to each user
     const enriched = users.map(user => ({
@@ -51,7 +51,7 @@ export async function GET() {
       stats: computeStats(predictions.filter(p => p.user_id === user.id)),
     }))
 
-    return NextResponse.json({ ok: true, leaderboard: enriched }, { headers: { 'Cache-Control': 'public, s-maxage=3, stale-while-revalidate=10' } })
+    return NextResponse.json({ ok: true, leaderboard: enriched }, { headers: { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=30' } })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
