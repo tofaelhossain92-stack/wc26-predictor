@@ -15,6 +15,6 @@ export async function GET() {
   })
   const matches = await res.json()
   return NextResponse.json({ ok: true, matches }, {
-    headers: { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=30' }
+    headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' }
   })
 }

@@ -45,27 +45,12 @@ export default function GameClient() {
     }
   }, [router])
 
-  // Fetch team form for upcoming matches
-  const fetchForm = useCallback(async (matchList) => {
-    const upcoming = (matchList || []).filter(m => m.status === 'upcoming')
-    if (!upcoming.length) return
-    const teams = [...new Set(upcoming.flatMap(m => [m.home_team, m.away_team]))].join(',')
-    try {
-      const res  = await fetch(`/api/form?teams=${encodeURIComponent(teams)}`)
-      const data = await res.json()
-      setFormData(data)
-    } catch {}
-  }, [])
-
-  // Fetch matches from Supabase
+  // Fetch matches from Supabase — no cache bypass, let edge cache absorb burst traffic
   const fetchMatches = useCallback(async () => {
-    const res = await fetch('/api/matches', { cache: 'no-store' })
+    const res = await fetch('/api/matches')
     const data = await res.json()
-    if (data.ok) {
-      setMatches(data.matches)
-      fetchForm(data.matches)
-    }
-  }, [fetchForm])
+    if (data.ok) setMatches(data.matches)
+  }, [])
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
@@ -77,7 +62,7 @@ export default function GameClient() {
   useEffect(() => {
     if (!user) return
     Promise.all([fetchMatches(), fetchLeaderboard()]).then(() => setLoading(false))
-  }, [user, fetchMatches, fetchLeaderboard])
+  }, [user]) // eslint-disable-line
 
   // Live score polling — refresh DB from API + pull fresh data from DB
   useEffect(() => {
@@ -96,7 +81,7 @@ export default function GameClient() {
     }
 
     refresh()
-    const interval = setInterval(refresh, 90000) // safety-net refresh every 90s (realtime covers most updates)
+    const interval = setInterval(refresh, 180000) // safety-net refresh every 3 mins (realtime covers most updates)
     return () => clearInterval(interval)
   }, [matches, fetchMatches])
 
@@ -108,7 +93,7 @@ export default function GameClient() {
       .channel('matches-channel')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches' }, () => {
         clearTimeout(matchDebounce)
-        matchDebounce = setTimeout(() => fetchMatches(), 2000) // wait 2s, collapse rapid-fire updates
+        matchDebounce = setTimeout(() => fetchMatches(), 5000) // wait 5s, collapse rapid-fire updates
       })
       .subscribe()
 
@@ -116,7 +101,7 @@ export default function GameClient() {
       .channel('users-channel')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
         clearTimeout(userDebounce)
-        userDebounce = setTimeout(() => fetchLeaderboard(), 2000)
+        userDebounce = setTimeout(() => fetchLeaderboard(), 5000)
       })
       .subscribe()
 

@@ -51,7 +51,7 @@ export async function GET() {
       stats: computeStats(predictions.filter(p => p.user_id === user.id)),
     }))
 
-    return NextResponse.json({ ok: true, leaderboard: enriched }, { headers: { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=30' } })
+    return NextResponse.json({ ok: true, leaderboard: enriched }, { headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' } })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
