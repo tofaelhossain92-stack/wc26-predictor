@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-const KNOCKOUT_GROUPS = ['R16', 'QF', 'SF', '3RD', 'FINAL'] // R32 hidden — knockout stage progressed
+const KNOCKOUT_GROUPS = ['QF', 'SF', '3RD', 'FINAL'] // R32+R16 hidden — QF stage
 const KNOCKOUT_LABELS = {
   R32: 'Round of 32',
   R16: 'Round of 16',
